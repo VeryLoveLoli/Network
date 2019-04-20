@@ -1,0 +1,1015 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		5EEB0782226B425C00B080E0 /* NetworkOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EEB0781226B425C00B080E0 /* NetworkOperation.swift */; };
+		5EEB0784226B442600B080E0 /* NetworkImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EEB0783226B442600B080E0 /* NetworkImage.swift */; };
+		5EEB078D226B6E9500B080E0 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EEB078C226B6E9500B080E0 /* AppDelegate.swift */; };
+		5EEB078F226B6E9500B080E0 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EEB078E226B6E9500B080E0 /* ViewController.swift */; };
+		5EEB0791226B6E9600B080E0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5EEB0790226B6E9600B080E0 /* Assets.xcassets */; };
+		5EEB0794226B6E9600B080E0 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5EEB0792226B6E9600B080E0 /* Main.storyboard */; };
+		5EEB07A0226B6E9700B080E0 /* NetworkTest_MacTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EEB079F226B6E9700B080E0 /* NetworkTest_MacTests.swift */; };
+		5EEB07AB226B6E9700B080E0 /* NetworkTest_MacUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EEB07AA226B6E9700B080E0 /* NetworkTest_MacUITests.swift */; };
+		5EEB07B6226B717D00B080E0 /* Network.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EFE6839226A15420002A478 /* Network.swift */; };
+		5EEB07B7226B717D00B080E0 /* NetworkOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EEB0781226B425C00B080E0 /* NetworkOperation.swift */; };
+		5EEB07B8226B717D00B080E0 /* NetworkImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EEB0783226B442600B080E0 /* NetworkImage.swift */; };
+		5EFE6808226A15110002A478 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EFE6807226A15110002A478 /* AppDelegate.swift */; };
+		5EFE680A226A15110002A478 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EFE6809226A15110002A478 /* ViewController.swift */; };
+		5EFE680D226A15110002A478 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5EFE680B226A15110002A478 /* Main.storyboard */; };
+		5EFE6810226A15110002A478 /* NetworkTest.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 5EFE680E226A15110002A478 /* NetworkTest.xcdatamodeld */; };
+		5EFE6812226A15120002A478 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5EFE6811226A15120002A478 /* Assets.xcassets */; };
+		5EFE6815226A15120002A478 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5EFE6813226A15120002A478 /* LaunchScreen.storyboard */; };
+		5EFE6820226A15130002A478 /* NetworkTestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EFE681F226A15130002A478 /* NetworkTestTests.swift */; };
+		5EFE682B226A15130002A478 /* NetworkTestUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EFE682A226A15130002A478 /* NetworkTestUITests.swift */; };
+		5EFE683A226A15420002A478 /* Network.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EFE6839226A15420002A478 /* Network.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		5EEB079C226B6E9700B080E0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5EFE67FC226A15110002A478 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5EEB0789226B6E9500B080E0;
+			remoteInfo = "NetworkTest Mac";
+		};
+		5EEB07A7226B6E9700B080E0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5EFE67FC226A15110002A478 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5EEB0789226B6E9500B080E0;
+			remoteInfo = "NetworkTest Mac";
+		};
+		5EFE681C226A15130002A478 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5EFE67FC226A15110002A478 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5EFE6803226A15110002A478;
+			remoteInfo = NetworkTest;
+		};
+		5EFE6827226A15130002A478 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5EFE67FC226A15110002A478 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5EFE6803226A15110002A478;
+			remoteInfo = NetworkTest;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		5EEB0781226B425C00B080E0 /* NetworkOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkOperation.swift; sourceTree = "<group>"; };
+		5EEB0783226B442600B080E0 /* NetworkImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkImage.swift; sourceTree = "<group>"; };
+		5EEB078A226B6E9500B080E0 /* NetworkTest Mac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "NetworkTest Mac.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		5EEB078C226B6E9500B080E0 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		5EEB078E226B6E9500B080E0 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		5EEB0790226B6E9600B080E0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		5EEB0793226B6E9600B080E0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		5EEB0795226B6E9600B080E0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		5EEB0796226B6E9700B080E0 /* NetworkTest_Mac.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = NetworkTest_Mac.entitlements; sourceTree = "<group>"; };
+		5EEB079B226B6E9700B080E0 /* NetworkTest MacTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "NetworkTest MacTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		5EEB079F226B6E9700B080E0 /* NetworkTest_MacTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkTest_MacTests.swift; sourceTree = "<group>"; };
+		5EEB07A1226B6E9700B080E0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		5EEB07A6226B6E9700B080E0 /* NetworkTest MacUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "NetworkTest MacUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		5EEB07AA226B6E9700B080E0 /* NetworkTest_MacUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkTest_MacUITests.swift; sourceTree = "<group>"; };
+		5EEB07AC226B6E9700B080E0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		5EFE6804226A15110002A478 /* NetworkTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NetworkTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		5EFE6807226A15110002A478 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		5EFE6809226A15110002A478 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		5EFE680C226A15110002A478 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		5EFE680F226A15110002A478 /* NetworkTest.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = NetworkTest.xcdatamodel; sourceTree = "<group>"; };
+		5EFE6811226A15120002A478 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		5EFE6814226A15120002A478 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		5EFE6816226A15120002A478 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		5EFE681B226A15130002A478 /* NetworkTestTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NetworkTestTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		5EFE681F226A15130002A478 /* NetworkTestTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkTestTests.swift; sourceTree = "<group>"; };
+		5EFE6821226A15130002A478 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		5EFE6826226A15130002A478 /* NetworkTestUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NetworkTestUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		5EFE682A226A15130002A478 /* NetworkTestUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkTestUITests.swift; sourceTree = "<group>"; };
+		5EFE682C226A15130002A478 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		5EFE6839226A15420002A478 /* Network.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Network.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		5EEB0787226B6E9500B080E0 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5EEB0798226B6E9700B080E0 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5EEB07A3226B6E9700B080E0 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5EFE6801226A15110002A478 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5EFE6818226A15130002A478 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5EFE6823226A15130002A478 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		5EEB078B226B6E9500B080E0 /* NetworkTest Mac */ = {
+			isa = PBXGroup;
+			children = (
+				5EEB078C226B6E9500B080E0 /* AppDelegate.swift */,
+				5EEB078E226B6E9500B080E0 /* ViewController.swift */,
+				5EEB0790226B6E9600B080E0 /* Assets.xcassets */,
+				5EEB0792226B6E9600B080E0 /* Main.storyboard */,
+				5EEB0795226B6E9600B080E0 /* Info.plist */,
+				5EEB0796226B6E9700B080E0 /* NetworkTest_Mac.entitlements */,
+			);
+			path = "NetworkTest Mac";
+			sourceTree = "<group>";
+		};
+		5EEB079E226B6E9700B080E0 /* NetworkTest MacTests */ = {
+			isa = PBXGroup;
+			children = (
+				5EEB079F226B6E9700B080E0 /* NetworkTest_MacTests.swift */,
+				5EEB07A1226B6E9700B080E0 /* Info.plist */,
+			);
+			path = "NetworkTest MacTests";
+			sourceTree = "<group>";
+		};
+		5EEB07A9226B6E9700B080E0 /* NetworkTest MacUITests */ = {
+			isa = PBXGroup;
+			children = (
+				5EEB07AA226B6E9700B080E0 /* NetworkTest_MacUITests.swift */,
+				5EEB07AC226B6E9700B080E0 /* Info.plist */,
+			);
+			path = "NetworkTest MacUITests";
+			sourceTree = "<group>";
+		};
+		5EFE67FB226A15110002A478 = {
+			isa = PBXGroup;
+			children = (
+				5EFE6838226A15320002A478 /* Source */,
+				5EFE6806226A15110002A478 /* NetworkTest */,
+				5EFE681E226A15130002A478 /* NetworkTestTests */,
+				5EFE6829226A15130002A478 /* NetworkTestUITests */,
+				5EEB078B226B6E9500B080E0 /* NetworkTest Mac */,
+				5EEB079E226B6E9700B080E0 /* NetworkTest MacTests */,
+				5EEB07A9226B6E9700B080E0 /* NetworkTest MacUITests */,
+				5EFE6805226A15110002A478 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		5EFE6805226A15110002A478 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				5EFE6804226A15110002A478 /* NetworkTest.app */,
+				5EFE681B226A15130002A478 /* NetworkTestTests.xctest */,
+				5EFE6826226A15130002A478 /* NetworkTestUITests.xctest */,
+				5EEB078A226B6E9500B080E0 /* NetworkTest Mac.app */,
+				5EEB079B226B6E9700B080E0 /* NetworkTest MacTests.xctest */,
+				5EEB07A6226B6E9700B080E0 /* NetworkTest MacUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		5EFE6806226A15110002A478 /* NetworkTest */ = {
+			isa = PBXGroup;
+			children = (
+				5EFE6807226A15110002A478 /* AppDelegate.swift */,
+				5EFE6809226A15110002A478 /* ViewController.swift */,
+				5EFE680B226A15110002A478 /* Main.storyboard */,
+				5EFE6811226A15120002A478 /* Assets.xcassets */,
+				5EFE6813226A15120002A478 /* LaunchScreen.storyboard */,
+				5EFE6816226A15120002A478 /* Info.plist */,
+				5EFE680E226A15110002A478 /* NetworkTest.xcdatamodeld */,
+			);
+			path = NetworkTest;
+			sourceTree = "<group>";
+		};
+		5EFE681E226A15130002A478 /* NetworkTestTests */ = {
+			isa = PBXGroup;
+			children = (
+				5EFE681F226A15130002A478 /* NetworkTestTests.swift */,
+				5EFE6821226A15130002A478 /* Info.plist */,
+			);
+			path = NetworkTestTests;
+			sourceTree = "<group>";
+		};
+		5EFE6829226A15130002A478 /* NetworkTestUITests */ = {
+			isa = PBXGroup;
+			children = (
+				5EFE682A226A15130002A478 /* NetworkTestUITests.swift */,
+				5EFE682C226A15130002A478 /* Info.plist */,
+			);
+			path = NetworkTestUITests;
+			sourceTree = "<group>";
+		};
+		5EFE6838226A15320002A478 /* Source */ = {
+			isa = PBXGroup;
+			children = (
+				5EFE6839226A15420002A478 /* Network.swift */,
+				5EEB0781226B425C00B080E0 /* NetworkOperation.swift */,
+				5EEB0783226B442600B080E0 /* NetworkImage.swift */,
+			);
+			name = Source;
+			path = ../Source;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		5EEB0789226B6E9500B080E0 /* NetworkTest Mac */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5EEB07AD226B6E9700B080E0 /* Build configuration list for PBXNativeTarget "NetworkTest Mac" */;
+			buildPhases = (
+				5EEB0786226B6E9500B080E0 /* Sources */,
+				5EEB0787226B6E9500B080E0 /* Frameworks */,
+				5EEB0788226B6E9500B080E0 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "NetworkTest Mac";
+			productName = "NetworkTest Mac";
+			productReference = 5EEB078A226B6E9500B080E0 /* NetworkTest Mac.app */;
+			productType = "com.apple.product-type.application";
+		};
+		5EEB079A226B6E9700B080E0 /* NetworkTest MacTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5EEB07B0226B6E9700B080E0 /* Build configuration list for PBXNativeTarget "NetworkTest MacTests" */;
+			buildPhases = (
+				5EEB0797226B6E9700B080E0 /* Sources */,
+				5EEB0798226B6E9700B080E0 /* Frameworks */,
+				5EEB0799226B6E9700B080E0 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				5EEB079D226B6E9700B080E0 /* PBXTargetDependency */,
+			);
+			name = "NetworkTest MacTests";
+			productName = "NetworkTest MacTests";
+			productReference = 5EEB079B226B6E9700B080E0 /* NetworkTest MacTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		5EEB07A5226B6E9700B080E0 /* NetworkTest MacUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5EEB07B3226B6E9700B080E0 /* Build configuration list for PBXNativeTarget "NetworkTest MacUITests" */;
+			buildPhases = (
+				5EEB07A2226B6E9700B080E0 /* Sources */,
+				5EEB07A3226B6E9700B080E0 /* Frameworks */,
+				5EEB07A4226B6E9700B080E0 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				5EEB07A8226B6E9700B080E0 /* PBXTargetDependency */,
+			);
+			name = "NetworkTest MacUITests";
+			productName = "NetworkTest MacUITests";
+			productReference = 5EEB07A6226B6E9700B080E0 /* NetworkTest MacUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		5EFE6803226A15110002A478 /* NetworkTest */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5EFE682F226A15130002A478 /* Build configuration list for PBXNativeTarget "NetworkTest" */;
+			buildPhases = (
+				5EFE6800226A15110002A478 /* Sources */,
+				5EFE6801226A15110002A478 /* Frameworks */,
+				5EFE6802226A15110002A478 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = NetworkTest;
+			productName = NetworkTest;
+			productReference = 5EFE6804226A15110002A478 /* NetworkTest.app */;
+			productType = "com.apple.product-type.application";
+		};
+		5EFE681A226A15130002A478 /* NetworkTestTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5EFE6832226A15130002A478 /* Build configuration list for PBXNativeTarget "NetworkTestTests" */;
+			buildPhases = (
+				5EFE6817226A15130002A478 /* Sources */,
+				5EFE6818226A15130002A478 /* Frameworks */,
+				5EFE6819226A15130002A478 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				5EFE681D226A15130002A478 /* PBXTargetDependency */,
+			);
+			name = NetworkTestTests;
+			productName = NetworkTestTests;
+			productReference = 5EFE681B226A15130002A478 /* NetworkTestTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		5EFE6825226A15130002A478 /* NetworkTestUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5EFE6835226A15130002A478 /* Build configuration list for PBXNativeTarget "NetworkTestUITests" */;
+			buildPhases = (
+				5EFE6822226A15130002A478 /* Sources */,
+				5EFE6823226A15130002A478 /* Frameworks */,
+				5EFE6824226A15130002A478 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				5EFE6828226A15130002A478 /* PBXTargetDependency */,
+			);
+			name = NetworkTestUITests;
+			productName = NetworkTestUITests;
+			productReference = 5EFE6826226A15130002A478 /* NetworkTestUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		5EFE67FC226A15110002A478 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 1020;
+				LastUpgradeCheck = 1020;
+				ORGANIZATIONNAME = "韦烽传";
+				TargetAttributes = {
+					5EEB0789226B6E9500B080E0 = {
+						CreatedOnToolsVersion = 10.2.1;
+						SystemCapabilities = {
+							com.apple.Sandbox = {
+								enabled = 0;
+							};
+						};
+					};
+					5EEB079A226B6E9700B080E0 = {
+						CreatedOnToolsVersion = 10.2.1;
+						TestTargetID = 5EEB0789226B6E9500B080E0;
+					};
+					5EEB07A5226B6E9700B080E0 = {
+						CreatedOnToolsVersion = 10.2.1;
+						TestTargetID = 5EEB0789226B6E9500B080E0;
+					};
+					5EFE6803226A15110002A478 = {
+						CreatedOnToolsVersion = 10.2.1;
+					};
+					5EFE681A226A15130002A478 = {
+						CreatedOnToolsVersion = 10.2.1;
+						TestTargetID = 5EFE6803226A15110002A478;
+					};
+					5EFE6825226A15130002A478 = {
+						CreatedOnToolsVersion = 10.2.1;
+						TestTargetID = 5EFE6803226A15110002A478;
+					};
+				};
+			};
+			buildConfigurationList = 5EFE67FF226A15110002A478 /* Build configuration list for PBXProject "NetworkTest" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 5EFE67FB226A15110002A478;
+			productRefGroup = 5EFE6805226A15110002A478 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				5EFE6803226A15110002A478 /* NetworkTest */,
+				5EFE681A226A15130002A478 /* NetworkTestTests */,
+				5EFE6825226A15130002A478 /* NetworkTestUITests */,
+				5EEB0789226B6E9500B080E0 /* NetworkTest Mac */,
+				5EEB079A226B6E9700B080E0 /* NetworkTest MacTests */,
+				5EEB07A5226B6E9700B080E0 /* NetworkTest MacUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		5EEB0788226B6E9500B080E0 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5EEB0791226B6E9600B080E0 /* Assets.xcassets in Resources */,
+				5EEB0794226B6E9600B080E0 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5EEB0799226B6E9700B080E0 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5EEB07A4226B6E9700B080E0 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5EFE6802226A15110002A478 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5EFE6815226A15120002A478 /* LaunchScreen.storyboard in Resources */,
+				5EFE6812226A15120002A478 /* Assets.xcassets in Resources */,
+				5EFE680D226A15110002A478 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5EFE6819226A15130002A478 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5EFE6824226A15130002A478 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		5EEB0786226B6E9500B080E0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5EEB07B6226B717D00B080E0 /* Network.swift in Sources */,
+				5EEB07B7226B717D00B080E0 /* NetworkOperation.swift in Sources */,
+				5EEB07B8226B717D00B080E0 /* NetworkImage.swift in Sources */,
+				5EEB078F226B6E9500B080E0 /* ViewController.swift in Sources */,
+				5EEB078D226B6E9500B080E0 /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5EEB0797226B6E9700B080E0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5EEB07A0226B6E9700B080E0 /* NetworkTest_MacTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5EEB07A2226B6E9700B080E0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5EEB07AB226B6E9700B080E0 /* NetworkTest_MacUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5EFE6800226A15110002A478 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5EFE6810226A15110002A478 /* NetworkTest.xcdatamodeld in Sources */,
+				5EFE680A226A15110002A478 /* ViewController.swift in Sources */,
+				5EEB0782226B425C00B080E0 /* NetworkOperation.swift in Sources */,
+				5EFE683A226A15420002A478 /* Network.swift in Sources */,
+				5EEB0784226B442600B080E0 /* NetworkImage.swift in Sources */,
+				5EFE6808226A15110002A478 /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5EFE6817226A15130002A478 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5EFE6820226A15130002A478 /* NetworkTestTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5EFE6822226A15130002A478 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5EFE682B226A15130002A478 /* NetworkTestUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		5EEB079D226B6E9700B080E0 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5EEB0789226B6E9500B080E0 /* NetworkTest Mac */;
+			targetProxy = 5EEB079C226B6E9700B080E0 /* PBXContainerItemProxy */;
+		};
+		5EEB07A8226B6E9700B080E0 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5EEB0789226B6E9500B080E0 /* NetworkTest Mac */;
+			targetProxy = 5EEB07A7226B6E9700B080E0 /* PBXContainerItemProxy */;
+		};
+		5EFE681D226A15130002A478 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5EFE6803226A15110002A478 /* NetworkTest */;
+			targetProxy = 5EFE681C226A15130002A478 /* PBXContainerItemProxy */;
+		};
+		5EFE6828226A15130002A478 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5EFE6803226A15110002A478 /* NetworkTest */;
+			targetProxy = 5EFE6827226A15130002A478 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		5EEB0792226B6E9600B080E0 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				5EEB0793226B6E9600B080E0 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		5EFE680B226A15110002A478 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				5EFE680C226A15110002A478 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		5EFE6813226A15120002A478 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				5EFE6814226A15120002A478 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		5EEB07AE226B6E9700B080E0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = "NetworkTest Mac/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				PRODUCT_BUNDLE_IDENTIFIER = "chuancan-icloud.com.NetworkTest-Mac";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		5EEB07AF226B6E9700B080E0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = "NetworkTest Mac/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				PRODUCT_BUNDLE_IDENTIFIER = "chuancan-icloud.com.NetworkTest-Mac";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		5EEB07B1226B6E9700B080E0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = "NetworkTest MacTests/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				PRODUCT_BUNDLE_IDENTIFIER = "chuancan-icloud.com.NetworkTest-MacTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/NetworkTest Mac.app/Contents/MacOS/NetworkTest Mac";
+			};
+			name = Debug;
+		};
+		5EEB07B2226B6E9700B080E0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = "NetworkTest MacTests/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				PRODUCT_BUNDLE_IDENTIFIER = "chuancan-icloud.com.NetworkTest-MacTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/NetworkTest Mac.app/Contents/MacOS/NetworkTest Mac";
+			};
+			name = Release;
+		};
+		5EEB07B4226B6E9700B080E0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = "NetworkTest MacUITests/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				PRODUCT_BUNDLE_IDENTIFIER = "chuancan-icloud.com.NetworkTest-MacUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = "NetworkTest Mac";
+			};
+			name = Debug;
+		};
+		5EEB07B5226B6E9700B080E0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = "NetworkTest MacUITests/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				PRODUCT_BUNDLE_IDENTIFIER = "chuancan-icloud.com.NetworkTest-MacUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = "NetworkTest Mac";
+			};
+			name = Release;
+		};
+		5EFE682D226A15130002A478 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		5EFE682E226A15130002A478 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		5EFE6830226A15130002A478 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = NetworkTest/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "chuancan-icloud.com.NetworkTest";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		5EFE6831226A15130002A478 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = NetworkTest/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "chuancan-icloud.com.NetworkTest";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		5EFE6833226A15130002A478 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = NetworkTestTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "chuancan-icloud.com.NetworkTestTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/NetworkTest.app/NetworkTest";
+			};
+			name = Debug;
+		};
+		5EFE6834226A15130002A478 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = NetworkTestTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "chuancan-icloud.com.NetworkTestTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/NetworkTest.app/NetworkTest";
+			};
+			name = Release;
+		};
+		5EFE6836226A15130002A478 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = NetworkTestUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "chuancan-icloud.com.NetworkTestUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = NetworkTest;
+			};
+			name = Debug;
+		};
+		5EFE6837226A15130002A478 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = NetworkTestUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "chuancan-icloud.com.NetworkTestUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = NetworkTest;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		5EEB07AD226B6E9700B080E0 /* Build configuration list for PBXNativeTarget "NetworkTest Mac" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5EEB07AE226B6E9700B080E0 /* Debug */,
+				5EEB07AF226B6E9700B080E0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5EEB07B0226B6E9700B080E0 /* Build configuration list for PBXNativeTarget "NetworkTest MacTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5EEB07B1226B6E9700B080E0 /* Debug */,
+				5EEB07B2226B6E9700B080E0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5EEB07B3226B6E9700B080E0 /* Build configuration list for PBXNativeTarget "NetworkTest MacUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5EEB07B4226B6E9700B080E0 /* Debug */,
+				5EEB07B5226B6E9700B080E0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5EFE67FF226A15110002A478 /* Build configuration list for PBXProject "NetworkTest" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5EFE682D226A15130002A478 /* Debug */,
+				5EFE682E226A15130002A478 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5EFE682F226A15130002A478 /* Build configuration list for PBXNativeTarget "NetworkTest" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5EFE6830226A15130002A478 /* Debug */,
+				5EFE6831226A15130002A478 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5EFE6832226A15130002A478 /* Build configuration list for PBXNativeTarget "NetworkTestTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5EFE6833226A15130002A478 /* Debug */,
+				5EFE6834226A15130002A478 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5EFE6835226A15130002A478 /* Build configuration list for PBXNativeTarget "NetworkTestUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5EFE6836226A15130002A478 /* Debug */,
+				5EFE6837226A15130002A478 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		5EFE680E226A15110002A478 /* NetworkTest.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				5EFE680F226A15110002A478 /* NetworkTest.xcdatamodel */,
+			);
+			currentVersion = 5EFE680F226A15110002A478 /* NetworkTest.xcdatamodel */;
+			path = NetworkTest.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
+	};
+	rootObject = 5EFE67FC226A15110002A478 /* Project object */;
+}

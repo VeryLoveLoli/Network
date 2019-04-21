@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5E04890F226C5C5300B4B77E /* Socket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E04890E226C5C5300B4B77E /* Socket.swift */; };
 		5EEB0782226B425C00B080E0 /* NetworkOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EEB0781226B425C00B080E0 /* NetworkOperation.swift */; };
 		5EEB0784226B442600B080E0 /* NetworkImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EEB0783226B442600B080E0 /* NetworkImage.swift */; };
 		5EEB078D226B6E9500B080E0 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EEB078C226B6E9500B080E0 /* AppDelegate.swift */; };
@@ -61,6 +62,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		5E04890E226C5C5300B4B77E /* Socket.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Socket.swift; sourceTree = "<group>"; };
 		5EEB0781226B425C00B080E0 /* NetworkOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkOperation.swift; sourceTree = "<group>"; };
 		5EEB0783226B442600B080E0 /* NetworkImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkImage.swift; sourceTree = "<group>"; };
 		5EEB078A226B6E9500B080E0 /* NetworkTest Mac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "NetworkTest Mac.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -235,6 +237,7 @@
 				5EFE6839226A15420002A478 /* Network.swift */,
 				5EEB0781226B425C00B080E0 /* NetworkOperation.swift */,
 				5EEB0783226B442600B080E0 /* NetworkImage.swift */,
+				5E04890E226C5C5300B4B77E /* Socket.swift */,
 			);
 			name = Source;
 			path = ../Source;
@@ -495,6 +498,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5EFE6810226A15110002A478 /* NetworkTest.xcdatamodeld in Sources */,
+				5E04890F226C5C5300B4B77E /* Socket.swift in Sources */,
 				5EFE680A226A15110002A478 /* ViewController.swift in Sources */,
 				5EEB0782226B425C00B080E0 /* NetworkOperation.swift in Sources */,
 				5EFE683A226A15420002A478 /* Network.swift in Sources */,

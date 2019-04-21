@@ -36,9 +36,11 @@ public class Network: NetworkOperationDelegate {
     /// 回调字典
     private var callback: [String: Callback] = [:]
     /// 最大并发数量
-    var maxConcurrent = Int.max
+    public var maxConcurrent = Int.max { didSet { exceedMaxRunToWait(); nextRun() } }
     /// 磁盘文件夹路径
-    var path: String
+    public private(set) var path: String
+    
+    // MARK: - init
     
     public init(_ name: String, max: Int, directory: String) {
         
@@ -55,26 +57,7 @@ public class Network: NetworkOperationDelegate {
         self.init("Network", max: 3, directory: NSHomeDirectory() + "/Documents/Network/")
     }
     
-    /**
-     创建文件夹
-     */
-    private func createDirectory() {
-        
-        /// 文件管理
-        let fileManager: FileManager = FileManager.default
-        
-        /// 判断文件夹是否存在
-        if !fileManager.fileExists(atPath: path) {
-            
-            do {
-                /// 创建文件夹
-                try fileManager.createDirectory(atPath: path, withIntermediateDirectories: true, attributes: nil)
-                
-            } catch {
-                
-            }
-        }
-    }
+    // MARK: - Load
     
     /**
      加载
@@ -136,12 +119,9 @@ public class Network: NetworkOperationDelegate {
                      progress: @escaping CallbackProgress = { _,_ in },
                      result: @escaping CallbackResult) {
         
-        if let url = request.url, let data = url.absoluteString.data(using: .utf8) {
+        if let key = NetworkOperation.key(request) {
             
-            let key = data.base64EncodedString()
-            
-            let operation = NetworkOperation.init(key, request: request, path: isDisk ? (path + key) : nil)
-            operation.delegate = self
+            let operation = NetworkOperation.init(key, request: request, path: isDisk ? (path + key) : nil, delegate: self)
             
             addCallback(key, id: callbackID, callback: (progress, result))
 
@@ -155,6 +135,8 @@ public class Network: NetworkOperationDelegate {
             }
         }
     }
+    
+    // MARK: - Operation Queue
     
     /**
      添加运行
@@ -184,17 +166,7 @@ public class Network: NetworkOperationDelegate {
                 operation.start()
             }
             
-            /// 将过多的运行放入等待列表
-            while self.runList.count > self.maxConcurrent && self.runList.count > 1 {
-                
-                let last = self.runList.remove(at: self.runList.count - 1)
-                
-                if !last.isFinished {
-                    
-                    last.cancel()
-                    self.waitList.insert(NetworkOperation.init(last.key, request: last.request, path: last.path), at: 0)
-                }
-            }
+            self.exceedMaxRunToWait()
         }
     }
     
@@ -214,11 +186,23 @@ public class Network: NetworkOperationDelegate {
                 }
             }
             
-            /// 从等待列表中删除
-            _ = self.removeWait(operation.key)
+            /// 是否已存在
+            var isExist = false
             
-            /// 加入等待列表
-            self.waitList.insert(operation, at: 0)
+            for wait in self.waitList {
+                
+                if wait.key == operation.key {
+                    
+                    isExist = true
+                    break
+                }
+            }
+            
+            if !isExist {
+                
+                /// 加入等待列表
+                self.waitList.append(operation)
+            }
         }
         
         nextRun()
@@ -226,10 +210,14 @@ public class Network: NetworkOperationDelegate {
     
     /**
      删除
+     
+     - parameter    key:        操作标识    (外部调用需通过 NetworkOperation.key() 获取 )
      */
     public func remove(_ key: String) {
         
         self.serialQueue.async {
+            
+            self.removeRequestCallback(key)
             
             if self.removeRun(key) {
                 
@@ -268,7 +256,6 @@ public class Network: NetworkOperationDelegate {
             
             if self.waitList[i].key == key {
                 
-                self.waitList[i].cancel()
                 self.waitList.remove(at: i)
                 
                 return true
@@ -276,6 +263,26 @@ public class Network: NetworkOperationDelegate {
         }
         
         return false
+    }
+    
+    /**
+     将过多的运行放入等待列表
+     */
+    private func exceedMaxRunToWait() {
+        
+        self.serialQueue.async {
+            
+            while self.runList.count > self.maxConcurrent && self.runList.count > 1 {
+                
+                let last = self.runList.remove(at: self.runList.count - 1)
+                
+                if !last.isFinished {
+                    
+                    last.cancel()
+                    self.waitList.insert(NetworkOperation.init(last.key, request: last.request, path: last.path, delegate: self), at: 0)
+                }
+            }
+        }
     }
     
     /**
@@ -297,6 +304,8 @@ public class Network: NetworkOperationDelegate {
             }
         }
     }
+    
+    // MARK: - Callback
     
     /**
      添加回调
@@ -344,7 +353,7 @@ public class Network: NetworkOperationDelegate {
     /**
      删除回调
      
-     - parameter    id:         回调ID
+     - parameter    id:         回调ID    (外部调用需在 load() 时 设置)
      */
     public func removeCallback(_ id: String) {
         
@@ -409,6 +418,77 @@ public class Network: NetworkOperationDelegate {
         }
     }
     
+    // MARK: - FileManager
+    
+    /**
+     创建文件夹
+     */
+    private func createDirectory() {
+        
+        /// 文件管理
+        let fileManager: FileManager = FileManager.default
+        
+        /// 判断文件夹是否存在
+        if !fileManager.fileExists(atPath: path) {
+            
+            do {
+                /// 创建文件夹
+                try fileManager.createDirectory(atPath: path, withIntermediateDirectories: true, attributes: nil)
+                
+            } catch {
+                
+            }
+        }
+    }
+    
+    /**
+     删除磁盘文件
+     
+     - parameter    key:        操作标识    (外部调用需通过 NetworkOperation.key() 获取 )
+     */
+    public func removeDiskFile(_ key: String) {
+        
+        self.concurrentQueue.async {
+            
+            /// 文件管理
+            let fileManager = FileManager.default
+            
+            do {
+                /// 删除文件
+                try fileManager.removeItem(atPath: self.path + key)
+                try fileManager.removeItem(atPath: self.path + key + ".cache")
+            } catch  {
+                
+            }
+        }
+    }
+    
+    /**
+     删除所有磁盘文件
+     */
+    public func removeAllDiskFile() {
+        
+        self.concurrentQueue.async {
+            
+            /// 文件管理
+            let fileManager = FileManager.default
+            /// 获取文件数组
+            if let fileArray = fileManager.subpaths(atPath: self.path) {
+                
+                for file in fileArray {
+                    
+                    do {
+                        /// 删除文件
+                        try fileManager.removeItem(atPath: self.path + file)
+                        
+                    } catch  {
+                        
+                    }
+                }
+            }
+        }
+    }
+    
     // MARK: - NetworkOperationDetegate
     
     func operation(_ key: String, received: Int64, expectedToReceive: Int64) {
@@ -418,25 +498,20 @@ public class Network: NetworkOperationDelegate {
     
     func operation(_ key: String, error: Error) {
         
-        _ = removeRun(key)
         callbackResult(key, error: error, data: nil, path: nil)
-        removeRequestCallback(key)
+        remove(key)
     }
     
     func operation(_ key: String, data: Data) {
         
-        _ = removeRun(key)
-        nextRun()
         callbackResult(key, error: nil, data: data, path: nil)
-        removeRequestCallback(key)
+        remove(key)
     }
     
     func operation(_ key: String, path: String) {
         
-        _ = removeRun(key)
-        nextRun()
         callbackResult(key, error: nil, data: nil, path: path)
-        removeRequestCallback(key)
+        remove(key)
     }
 }
 

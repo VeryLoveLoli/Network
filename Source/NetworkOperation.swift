@@ -58,13 +58,61 @@ class NetworkOperation: Operation, URLSessionDelegate, URLSessionTaskDelegate, U
     /// 文件Handle
     private var fileHandle: FileHandle?
     
-    init(_ key: String, request: URLRequest, path: String? = nil) {
+    // MARK: - key
+    
+    /**
+     默认的标识
+     
+     - parameter    urlString:  地址字符串
+     */
+    static func key(_ urlString: String) -> String? {
+        
+        if let url = URL.init(string: urlString) {
+            
+            return key(url)
+        }
+        
+        return nil
+    }
+    
+    /**
+     默认的标识
+     
+     - parameter    url:        地址
+     */
+    static func key(_ url: URL) -> String? {
+        
+        return key(URLRequest.init(url: url))
+    }
+    
+    /**
+     默认的标识
+     
+     - parameter    request:    请求
+     */
+    static func key(_ request: URLRequest) -> String? {
+        
+        if let url = request.url, let data = url.absoluteString.data(using: .utf8) {
+            
+            return data.base64EncodedString()
+        }
+        
+        return nil
+    }
+    
+    // MARK: - init
+    
+    init(_ key: String, request: URLRequest, path: String? = nil, delegate: NetworkOperationDelegate? = nil) {
         
         self.key = key
         self.request = request
         self.path = path
+        self.delegate = delegate
     }
     
+    /**
+     操作主体，isExecuting/isFinished 是 main() 的状态
+     */
     override func main() {
         
         /// 断点下载
@@ -122,15 +170,18 @@ class NetworkOperation: Operation, URLSessionDelegate, URLSessionTaskDelegate, U
         
         /// 等待下载完成/出错
         dispatchSemaphore.wait()
-    }
-    
-    override func cancel() {
-        super.cancel()
+        
+        /// 清除
         delegate = nil
         session?.invalidateAndCancel()
         session = nil
         task?.cancel()
         task = nil
+    }
+    
+    override func cancel() {
+        super.cancel()
+        
         dispatchSemaphore.signal()
     }
     

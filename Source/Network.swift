@@ -8,12 +8,12 @@
 
 import Foundation
 
-/// 进度回调
-public typealias CallbackProgress = (Int64, Int64)->Void
-/// 结果回调
-public typealias CallbackResult = (Error?, Data?, String?)->Void
-/// 回调
-public typealias Callback = (CallbackProgress, CallbackResult)
+/// 网络进度回调
+public typealias NetworkCallbackProgress = (Int64, Int64)->Void
+/// 网络结果回调
+public typealias NetworkCallbackResult = (Error?, Data?, String?)->Void
+/// 网络回调
+public typealias NetworkCallback = (NetworkCallbackProgress, NetworkCallbackResult)
 
 /**
  网络
@@ -34,7 +34,7 @@ public class Network: NetworkOperationDelegate {
     /// 请求与回调列表
     private var requestCallback: [String: [String]] = [:]
     /// 回调字典
-    private var callback: [String: Callback] = [:]
+    private var callback: [String: NetworkCallback] = [:]
     /// 最大并发数量
     public var maxConcurrent = Int.max { didSet { exceedMaxRunToWait(); nextRun() } }
     /// 磁盘文件夹路径
@@ -73,8 +73,8 @@ public class Network: NetworkOperationDelegate {
                      isDisk: Bool = false,
                      isStart: Bool = true,
                      callbackID: String = "\(Date.init().timeIntervalSince1970)-\(arc4random())",
-                     progress: @escaping CallbackProgress = { _,_ in },
-                     result: @escaping CallbackResult) {
+                     progress: @escaping NetworkCallbackProgress = { _,_ in },
+                     result: @escaping NetworkCallbackResult) {
 
         if let url = URL.init(string: urlString) {
             
@@ -96,8 +96,8 @@ public class Network: NetworkOperationDelegate {
                      isDisk: Bool = false,
                      isStart: Bool = true,
                      callbackID: String = "\(Date.init().timeIntervalSince1970)-\(arc4random())",
-                     progress: @escaping CallbackProgress = { _,_ in },
-                     result: @escaping CallbackResult) {
+                     progress: @escaping NetworkCallbackProgress = { _,_ in },
+                     result: @escaping NetworkCallbackResult) {
 
         load(URLRequest.init(url: url), isDisk: isDisk, isStart: isStart, progress: progress, result: result)
     }
@@ -116,8 +116,8 @@ public class Network: NetworkOperationDelegate {
                      isDisk: Bool = false,
                      isStart: Bool = true,
                      callbackID: String = "\(Date.init().timeIntervalSince1970)-\(arc4random())",
-                     progress: @escaping CallbackProgress = { _,_ in },
-                     result: @escaping CallbackResult) {
+                     progress: @escaping NetworkCallbackProgress = { _,_ in },
+                     result: @escaping NetworkCallbackResult) {
         
         if let key = NetworkOperation.key(request) {
             
@@ -314,7 +314,7 @@ public class Network: NetworkOperationDelegate {
      - parameter    id:         回调ID
      - parameter    callback:   回调
      */
-    private func addCallback(_ key: String, id: String, callback: Callback) {
+    private func addCallback(_ key: String, id: String, callback: NetworkCallback) {
         
         self.serialQueue.async {
             

@@ -199,6 +199,9 @@ public extension Int8 {
     }
 }
 
+/// Socket 回调   (地址,字节,读取状态)
+public typealias SocketCallback = (Address, [UInt8], Int)->Void
+
 /**
  Socket
  */
@@ -212,12 +215,12 @@ public class Socket {
     public private(set) var id: Int32
     /// 连接状态
     public var status: Int32 { return fcntl(id, F_GETFL, 0)}
-    /// 是否已开始
-    private var isStart = false
-    /// 读取数据处理
-    public var recvProcess: (Address, [UInt8], Int)->Void = {_,_,_ in}
     /// 发送数据锁
     internal var sendLock = NSLock.init()
+    /// 回调字典
+    internal var callback: [String: SocketCallback] = [:]
+    /// 回调字典锁
+    internal var callbackLock = NSLock.init()
     
     // MARK: - init
     
@@ -257,21 +260,6 @@ public class Socket {
         self.port = port
         self.type = type
         self.id = id
-    }
-    
-    /**
-     启动
-     */
-    public func start() {
-        
-        if isStart {
-            
-            return
-        }
-        
-        isStart = true
-        
-        _ = bindAddress()
     }
     
     /**
@@ -321,6 +309,39 @@ public class Socket {
         var SNDBUF = sndbuf
         setsockopt(id, SOL_SOCKET, SO_SNDBUF, &SNDBUF, UInt32(MemoryLayout.stride(ofValue: SNDBUF)))
     }
+    
+    // MARK: - Callback
+    
+    /**
+     添加回调
+     
+     - parameter    key:        标识
+     - parameter    callback:   Socket 回调   (地址,字节,读取状态)
+     */
+    public func addCallback(_ key: String, callback: @escaping SocketCallback) {
+        
+        SocketQueue.concurrent.async {
+            
+            self.callbackLock.lock()
+            self.callback[key] = callback
+            self.callbackLock.unlock()
+        }
+    }
+    
+    /**
+     删除回调
+     
+     - parameter    key:        标识
+     */
+    public func removeCallback(_ key: String) {
+        
+        SocketQueue.concurrent.async {
+            
+            self.callbackLock.lock()
+            self.callback.removeValue(forKey: key)
+            self.callbackLock.unlock()
+        }
+    }
 }
 
 /**
@@ -328,6 +349,8 @@ public class Socket {
  */
 public class UDP: Socket {
     
+    // MARK: - init
+
     /**
      创建 UDP
      
@@ -349,29 +372,12 @@ public class UDP: Socket {
         self.init(id, port: port, type: .udp)
     }
     
+    // MARK: - socket
+
     /**
-     读取数据
-     
-     - parameter    address:    地址
-     - parameter    queue:      block队列
-     - parameter    block:      读取到的结果; bytes:读取到的数据;    code:recvfrom()函数的返回值
+     等待字节
      */
-    open func recvfromData(_ queue: DispatchQueue, block: @escaping (_ address: Address, _ data: Data?, _ code: Int)->Void) -> Void {
-        
-        recvfromBytes(queue) { (address, bytes, code) in
-            
-            block(address, code < 0 ? nil : Data.init(bytes: bytes, count: code), code)
-        }
-    }
-    
-    /**
-     读取数据
-     
-     - parameter    address:    地址
-     - parameter    queue:      block队列
-     - parameter    block:      读取到的结果; bytes:读取到的数据;    code:recvfrom()函数的返回值
-     */
-    open func recvfromBytes(_ queue: DispatchQueue, block: @escaping (_ address: Address, _ bytes: [UInt8], _ code: Int)->Void) -> Void {
+    public func waitBytes() {
         
         SocketQueue.concurrent.async {
             
@@ -387,10 +393,14 @@ public class UDP: Socket {
                 code = recvfrom(self.id, &bytes, bytes.count, 0, &addr, &len)
                 
                 let address = Address.init(addr: addr)
-                
-                queue.async {
-                    
-                    block(address, bytes, code)
+
+                /// 广播回调
+                SocketQueue.concurrent.async {
+                    self.callbackLock.lock()
+                    for (_, callback) in self.callback {
+                        callback(address, bytes, code)
+                    }
+                    self.callbackLock.unlock()
                 }
                 
             } while code > 0
@@ -400,25 +410,23 @@ public class UDP: Socket {
     /**
      发送数据
      
-     - parameter    address:    地址
-     - parameter    data:       发送的数据
-     - parameter    queue:      block队列
-     - parameter    block:      发送结果; status:发送状态true=成功,false=失败;  code:sendto()函数的返回值
+     - parameter    address:        地址
+     - parameter    data:           发送的数据
+     - parameter    statusCode:     状态码 sendto()函数的返回值
      */
-    open func sendtoData(_ address: Address, data: Data, queue: DispatchQueue, block: @escaping (_ status: Bool, _ code: Int)->Void) -> Void {
+    public func sendtoData(_ address: Address, data: Data, statusCode: @escaping (Int)->Void) {
         
-        sendtoBytes(address, bytes: [UInt8].init(data), queue: queue, block: block)
+        sendtoBytes(address, bytes: [UInt8].init(data), statusCode: statusCode)
     }
     
     /**
-     发送数据
+     发送字节
      
-     - parameter    address:    地址
-     - parameter    data:       发送的数据
-     - parameter    queue:      block队列
-     - parameter    block:      发送结果; status:发送状态true=成功,false=失败;  code:sendto()函数的返回值
+     - parameter    address:        地址
+     - parameter    bytes:          发送的字节
+     - parameter    statusCode:     状态码 sendto()函数的返回值
      */
-    open func sendtoBytes(_ address: Address, bytes: [UInt8], queue: DispatchQueue, block: @escaping (_ status: Bool, _ code: Int)->Void) -> Void {
+    public func sendtoBytes(_ address: Address, bytes: [UInt8], statusCode: @escaping (Int)->Void) {
         
         SocketQueue.concurrent.async {
             
@@ -430,16 +438,30 @@ public class UDP: Socket {
             
             let sendCode = sendto(self.id, &sendBytes, sendBytes.count, 0, &addr, UInt32(MemoryLayout.stride(ofValue: addr)))
             
-            let status = sendCode > 0
-            
             self.sendLock.unlock()
             
-            queue.async(execute: {
-                
-                block(status, sendCode)
-            })
+            statusCode(sendCode)
         }
     }
+}
+
+/**
+ TCP Socket 字节处理协议
+ */
+public protocol TCPSocketBytesProcess {
+    
+    /// 字节
+    var bytes: [UInt8] { set get }
+    /// 读取状态
+    var code: Int { set get }
+    
+    /**
+     读取字节
+     
+     - parameter    bytes:      字节
+     - parameter    code:       读取状态
+     */
+    func recv(_ bytes: [UInt8], code: Int) -> Bool
 }
 
 /**
@@ -447,6 +469,9 @@ public class UDP: Socket {
  */
 public class TCP: Socket {
     
+    /// 字节处理
+    public var bytesProcess: TCPSocketBytesProcess?
+
     /**
      创建 TCP
      
@@ -474,13 +499,15 @@ public class TCP: Socket {
  */
 public class TCPClient: TCP {
     
+    // MARK: - socket
+    
     /**
      连接服务器
      
-     - parameter    address:    地址
-     - parameter    block: 连接结果; status:连接状态 true=成功,false=失败; code:connection()函数的返回值
+     - parameter    address:        地址
+     - parameter    statusCode:     状态码 connect()函数的返回值
      */
-    open func connection(_ address: Address, block: @escaping (_ status:Bool, _ code:Int32)->Void) -> Void {
+    public func connection(_ address: Address, statusCode: @escaping (Int32)->Void) {
         
         SocketQueue.concurrent.async {
             
@@ -493,31 +520,14 @@ public class TCPClient: TCP {
                 
             }
             
-            block(status == 0, status)
+            statusCode(status)
         }
     }
     
     /**
-     读取数据
-     
-     - parameter    queue:      block的队列
-     - parameter    block:      读取到的结果; data:读取到的数据;    code:recv()函数的返回值
+     等待字节
      */
-    public func recvData(_ queue: DispatchQueue, block: @escaping (_ data: Data?, _ code: Int)->Void) -> Void {
-        
-        recvBytes(queue) { (bytes, code) in
-            
-            block(code > 0 ? Data.init(bytes: UnsafePointer<UInt8>(bytes), count: code) : nil, code)
-        }
-    }
-    
-    /**
-     读取数据
-     
-     - parameter    queue:      block的队列
-     - parameter    block:      读取到的结果; data:读取到的数据;    code:recv()函数的返回值
-     */
-    public func recvBytes(_ queue: DispatchQueue, block: @escaping (_ bytes: [UInt8], _ code: Int)->Void) -> Void {
+    public func waitBytes() {
         
         SocketQueue.concurrent.async {
             
@@ -535,9 +545,26 @@ public class TCPClient: TCP {
                     self.cancel()
                 }
                 
-                queue.async {
+                /// 字节处理
+                if self.bytesProcess?.recv(bytes, code: code) ?? true {
                     
-                    block(bytes, code)
+                    if let b = self.bytesProcess?.bytes, let c = self.bytesProcess?.code {
+                        
+                        bytes = b
+                        code = c
+                        self.bytesProcess?.bytes = []
+                    }
+                    
+                    let address = Address.init(peername: self.id)
+
+                    /// 广播回调
+                    SocketQueue.concurrent.async {
+                        self.callbackLock.lock()
+                        for (_, callback) in self.callback {
+                            callback(address, bytes, code)
+                        }
+                        self.callbackLock.unlock()
+                    }
                 }
                 
             } while code > 0
@@ -549,21 +576,21 @@ public class TCPClient: TCP {
      
      - parameter    data:           发送的数据
      - parameter    repeatCount:    失败重发次数
-     - parameter    block:          发送结果; status:发送状态true=成功,false=失败;  code:send()函数的返回值
+     - parameter    statusCode:     状态码 send()函数的返回值
      */
-    public func sendData(_ data: Data, repeatCount: Int = 0, block: @escaping (_ status: Bool, _ code: Int)->Void) {
+    public func sendData(_ data: Data, repeatCount: Int = 0, statusCode: @escaping (Int)->Void) {
         
-        sendBytes([UInt8].init(data), repeatCount: repeatCount, block: block)
+        sendBytes([UInt8].init(data), repeatCount: repeatCount, statusCode: statusCode)
     }
     
     /**
-     发送数据
+     发送字节
      
-     - parameter    bytes:          发送的数据
+     - parameter    bytes:          发送的字节
      - parameter    repeatCount:    失败重发次数
-     - parameter    block:          发送结果; status:发送状态true=成功,false=失败;  code:send()函数的返回值
+     - parameter    statusCode:     状态码 send()函数的返回值
      */
-    public func sendBytes(_ bytes: [UInt8], repeatCount: Int = 0, block: @escaping (_ status: Bool, _ code: Int)->Void) {
+    public func sendBytes(_ bytes: [UInt8], repeatCount: Int = 0, statusCode: @escaping (Int)->Void) {
         
         SocketQueue.concurrent.async {
             
@@ -573,9 +600,7 @@ public class TCPClient: TCP {
             
             var repeat_index = 0
             
-            var status = true
-            
-            var sendCode : Int
+            var status = 0
             
             repeat {
                 
@@ -583,10 +608,11 @@ public class TCPClient: TCP {
                 
                 var sendBytes = [UInt8](bytes[index..<(index+len)])
                 
-                sendCode = send(self.id, &sendBytes, len, 0)
+                let sendCode = send(self.id, &sendBytes, len, 0)
                 
                 if sendCode == len {
                     
+                    status += sendCode
                     index += len
                     repeat_index = 0
                 }
@@ -596,7 +622,7 @@ public class TCPClient: TCP {
                 }
                 else {
                     
-                    status = false
+                    status = sendCode
                     break
                 }
                 
@@ -604,7 +630,7 @@ public class TCPClient: TCP {
             
             self.sendLock.unlock()
             
-            block(status, sendCode)
+            statusCode(status)
         }
     }
 }
@@ -614,11 +640,47 @@ public class TCPClient: TCP {
  */
 public class TCPServer: TCP {
     
-    /// 客户列表
-    public var clientList: [TCPClient] = []
-    /// 锁
-    public let lock = NSLock.init()
+    /// 客户字典
+    private var clientDict: [String: TCPClient] = [:]
+    /// 客户锁
+    private let clientLock = NSLock.init()
     
+    // MARK: - Client
+    
+    /**
+     添加客户
+     
+     - parameter    address:    地址
+     - parameter    client:     客户
+     */
+    public func addClient(_ address: Address, client: TCPClient) {
+        
+        SocketQueue.concurrent.async {
+            
+            self.clientLock.lock()
+            self.clientDict[address.ip + ":\(address.port)"] = client
+            self.clientLock.unlock()
+        }
+    }
+    
+    /**
+     删除客户
+     
+     - parameter    address:    地址
+     */
+    public func removeClient(_ address: Address) {
+        
+        SocketQueue.concurrent.async {
+            
+            self.clientLock.lock()
+            let client = self.clientDict.removeValue(forKey: address.ip + ":\(address.port)")
+            client?.cancel()
+            self.clientLock.unlock()
+        }
+    }
+    
+    // MARK: - socket
+
     /**
      监听客户端连接
      */
@@ -637,17 +699,79 @@ public class TCPServer: TCP {
                     
                     if id != -1 {
                         
-                        let client = TCPClient.init(id)
+                        let address = Address.init(addr: addr)
                         
+                        /// 广播新的客户
                         SocketQueue.concurrent.async {
                             
-                            self.lock.lock()
-                            self.clientList.append(client)
-                            self.lock.unlock()
+                            self.callbackLock.lock()
+                            for (_, callback) in self.callback {
+                                callback(address, [], Int(id))
+                            }
+                            self.callbackLock.unlock()
                         }
+                        
+                        let client = TCPClient.init(id)
+                        client.bytesProcess = self.bytesProcess
+                        
+                        client.addCallback(address.ip + ":\(address.port)", callback: { [weak self] (address, bytes, code) in
+                            
+                            /// 广播回调
+                            SocketQueue.concurrent.async {
+                                self?.callbackLock.lock()
+                                for (_, callback) in self?.callback ?? [:] {
+                                    callback(address, bytes, code)
+                                }
+                                self?.callbackLock.unlock()
+                            }
+                        })
+                        
+                        client.waitBytes()
+                        
+                        self.addClient(address, client: client)
                     }
                 }
             }
+        }
+    }
+    
+    /**
+     发送客户数据
+     
+     - parameter    address:        地址
+     - parameter    data:           发送的数据
+     - parameter    repeatCount:    失败重发次数
+     - parameter    statusCode:     状态码 send()函数的返回值; -99999: 客户未连接
+     */
+    public func sendClient(_ address: Address, data: Data, repeatCount: Int = 0, statusCode: @escaping (Int)->Void) {
+        
+        sendClient(address, bytes: [UInt8].init(data), repeatCount: repeatCount, statusCode: statusCode)
+    }
+    
+    /**
+     发送客户字节
+     
+     - parameter    address:        地址
+     - parameter    bytes:          发送的字节
+     - parameter    repeatCount:    失败重发次数
+     - parameter    statusCode:     状态码 send()函数的返回值; -99999: 客户未连接
+     */
+    public func sendClient(_ address: Address, bytes: [UInt8], repeatCount: Int = 0, statusCode: @escaping (Int)->Void) {
+        
+        SocketQueue.concurrent.async {
+            
+            self.clientLock.lock()
+            
+            if let client = self.clientDict[address.ip + ":\(address.port)"] {
+                
+                client.sendBytes(bytes, repeatCount: repeatCount, statusCode: statusCode)
+            }
+            else {
+                
+                statusCode(-99999)
+            }
+            
+            self.clientLock.unlock()
         }
     }
 }

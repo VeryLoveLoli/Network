@@ -50,7 +50,7 @@ public extension UIImageView {
               defaultImage: UIImage? = nil,
               isCache: Bool = true,
               isDisk: Bool = true,
-              progress: @escaping CallbackProgress = { _,_ in }) {
+              progress: @escaping NetworkCallbackProgress = { _,_ in }) {
         
         if let url = URL.init(string: urlString) {
             
@@ -71,7 +71,7 @@ public extension UIImageView {
               defaultImage: UIImage? = nil,
               isCache: Bool = true,
               isDisk: Bool = true,
-              progress: @escaping CallbackProgress = { _,_ in }) {
+              progress: @escaping NetworkCallbackProgress = { _,_ in }) {
 
         DispatchQueue.global().async {
             
@@ -148,7 +148,7 @@ public extension UIButton {
               defaultImage: UIImage? = nil,
               isCache: Bool = true,
               isDisk: Bool = true,
-              progress: @escaping CallbackProgress = { _,_ in }) {
+              progress: @escaping NetworkCallbackProgress = { _,_ in }) {
         
         if let url = URL.init(string: urlString) {
             
@@ -173,7 +173,7 @@ public extension UIButton {
               defaultImage: UIImage? = nil,
               isCache: Bool = true,
               isDisk: Bool = true,
-              progress: @escaping CallbackProgress = { _,_ in }) {
+              progress: @escaping NetworkCallbackProgress = { _,_ in }) {
         
         DispatchQueue.global().async {
             
@@ -290,7 +290,7 @@ public extension NSImageView {
               defaultImage: NSImage? = nil,
               isCache: Bool = true,
               isDisk: Bool = true,
-              progress: @escaping CallbackProgress = { _,_ in }) {
+              progress: @escaping NetworkCallbackProgress = { _,_ in }) {
         
         if let url = URL.init(string: urlString) {
             
@@ -311,7 +311,7 @@ public extension NSImageView {
               defaultImage: NSImage? = nil,
               isCache: Bool = true,
               isDisk: Bool = true,
-              progress: @escaping CallbackProgress = { _,_ in }) {
+              progress: @escaping NetworkCallbackProgress = { _,_ in }) {
         
         DispatchQueue.global().async {
             
@@ -387,7 +387,7 @@ public extension NSButton {
               defaultImage: NSImage? = nil,
               isCache: Bool = true,
               isDisk: Bool = true,
-              progress: @escaping CallbackProgress = { _,_ in }) {
+              progress: @escaping NetworkCallbackProgress = { _,_ in }) {
         
         if let url = URL.init(string: urlString) {
             
@@ -410,7 +410,7 @@ public extension NSButton {
               defaultImage: NSImage? = nil,
               isCache: Bool = true,
               isDisk: Bool = true,
-              progress: @escaping CallbackProgress = { _,_ in }) {
+              progress: @escaping NetworkCallbackProgress = { _,_ in }) {
         
         DispatchQueue.global().async {
             

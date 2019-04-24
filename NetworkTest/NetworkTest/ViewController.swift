@@ -17,10 +17,19 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         
-        imageView.load("http://i0.hdslb.com/bfs/archive/24e031e495699e234526586deb80c65d337cbe4d.png", defaultImage: nil, isCache: true, isDisk: true) { (current, total) in
-
+        UIImageView.init().load("https://i0.hdslb.com/bfs/archive/5e889fec08dab8cd8f7c6cc0478265ecb9839493.gif", defaultImage: nil, isCache: true, isDisk: true) { (current, total) in
+            
             print("image - \(current)/\(total) - \(String.init(format: "%.2f", Float(current)/Float(total)*100))%")
         }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(3)) {
+            
+            self.imageView.load("https://i0.hdslb.com/bfs/archive/5e889fec08dab8cd8f7c6cc0478265ecb9839493.gif", defaultImage: nil, isCache: true, isDisk: true) { (current, total) in
+                
+                print("image - \(current)/\(total) - \(String.init(format: "%.2f", Float(current)/Float(total)*100))%")
+            }
+        }
+        
         
         button.load("http://i0.hdslb.com/bfs/archive/24e031e495699e234526586deb80c65d337cbe4d.png", isBackground: false, state: .normal, defaultImage: nil, isCache: true, isDisk: true) { (current, total) in
             

@@ -8,6 +8,83 @@
 
 import Foundation
 
+#if os(iOS) || os(watchOS) || os(tvOS)
+import UIKit
+#endif
+
+/**
+ 数据缓存
+ */
+public class DataCache {
+    
+    /// 默认数据缓存
+    public static let `default` = DataCache.init("DataCache")
+    
+    /// 缓存数据
+    private var dictionary: Dictionary<String, Data> = [:]
+    /// 队列
+    private var serialQueue: DispatchQueue
+    
+    // MARK: - init
+    
+    public init(_ name: String) {
+        
+        serialQueue = DispatchQueue.init(label: name + ".serial")
+        
+        #if os(iOS) || os(watchOS) || os(tvOS)
+        /// 注册内存警告
+        NotificationCenter.default.addObserver(forName: UIApplication.didReceiveMemoryWarningNotification, object: nil, queue: nil) { (notification) in
+            
+            /// 删除缓存
+            self.removeAll()
+        }
+        #endif
+    }
+    
+    // MARK: - Data
+    
+    public func get(_ key: String) -> Data? {
+        
+        let dispatchSemaphore = DispatchSemaphore.init(value: 0)
+        
+        var data: Data? = nil
+        
+        serialQueue.async {
+            
+            data = self.dictionary[key]
+            dispatchSemaphore.signal()
+        }
+        
+        dispatchSemaphore.wait()
+        
+        return data
+    }
+    
+    public func add(_ key: String, data: Data) {
+        
+        serialQueue.async {
+            
+            self.dictionary[key] = data
+        }
+    }
+    
+    public func remove(_ key: String) {
+        
+        serialQueue.async {
+            
+            self.dictionary.removeValue(forKey: key)
+        }
+    }
+    
+    public func removeAll() {
+        
+        serialQueue.async {
+            
+            self.removeAll()
+        }
+    }
+}
+
 /**
  网络操作协议
  */
@@ -53,6 +130,8 @@ class NetworkOperation: Operation, URLSessionDelegate, URLSessionTaskDelegate, U
     var delegate: NetworkOperationDelegate?
     /// 数据
     var data = Data()
+    /// 是否缓存
+    var isCache: Bool
     /// 保存地址
     var path: String?
     /// 文件Handle
@@ -102,10 +181,20 @@ class NetworkOperation: Operation, URLSessionDelegate, URLSessionTaskDelegate, U
     
     // MARK: - init
     
-    init(_ key: String, request: URLRequest, path: String? = nil, delegate: NetworkOperationDelegate? = nil) {
+    /**
+     初始化
+     
+     - parameter    key:        标识
+     - parameter    request:    请求
+     - parameter    isCache:    是否缓存
+     - parameter    path:       磁盘路径(如果 path != nil 则 存储磁盘，并且不缓存数据)
+     - parameter    delegate:   网络操作协议
+     */
+    init(_ key: String, request: URLRequest, isCache: Bool = false, path: String? = nil, delegate: NetworkOperationDelegate? = nil) {
         
         self.key = key
         self.request = request
+        self.isCache = isCache
         self.path = path
         self.delegate = delegate
     }
@@ -161,6 +250,15 @@ class NetworkOperation: Operation, URLSessionDelegate, URLSessionTaskDelegate, U
                 
                 /// 设置下载偏移
                 request.setValue("bytes=\(fileSize)-", forHTTPHeaderField: "Range")
+            }
+        }
+        else if isCache {
+            
+            if let dataCache = DataCache.default.get(key) {
+                
+                delegate?.operation(key, received: 1, expectedToReceive: 1)
+                delegate?.operation(key, data: dataCache)
+                return
             }
         }
         

@@ -63,13 +63,15 @@ public class Network: NetworkOperationDelegate {
      加载
      
      - parameter    urlString:  地址字符串
-     - parameter    isDisk:     是否磁盘存储
+     - parameter    isCache:    是否缓存
+     - parameter    isDisk:     是否磁盘存储(存储磁盘则不缓存)
      - parameter    isStart:    是否立即开始
      - parameter    callbackID: 回调ID(用于取消 progress、result)
      - parameter    progress:   进度  (当前字节,总字节)
      - parameter    result:     结果  (错误信息,数据(isDisk = false 有值),数据路径(isDisk = true 有值))
      */
     public func load(_ urlString: String,
+                     isCache: Bool = false,
                      isDisk: Bool = false,
                      isStart: Bool = true,
                      callbackID: String = "\(Date.init().timeIntervalSince1970)-\(arc4random())",
@@ -78,7 +80,7 @@ public class Network: NetworkOperationDelegate {
 
         if let url = URL.init(string: urlString) {
             
-            load(url, isDisk: isDisk, isStart: isStart, progress: progress, result: result)
+            load(url, isCache: isCache, isDisk: isDisk, isStart: isStart, progress: progress, result: result)
         }
     }
     
@@ -86,33 +88,37 @@ public class Network: NetworkOperationDelegate {
      加载
      
      - parameter    url:        地址
-     - parameter    isDisk:     是否磁盘存储
+     - parameter    isCache:    是否缓存
+     - parameter    isDisk:     是否磁盘存储(存储磁盘则不缓存)
      - parameter    isStart:    是否立即开始
      - parameter    callbackID: 回调ID(用于取消 progress、result)
      - parameter    progress:   进度  (当前字节,总字节)
      - parameter    result:     结果  (错误信息,数据(isDisk = false 有值),数据路径(isDisk = true 有值))
      */
     public func load(_ url: URL,
+                     isCache: Bool = false,
                      isDisk: Bool = false,
                      isStart: Bool = true,
                      callbackID: String = "\(Date.init().timeIntervalSince1970)-\(arc4random())",
                      progress: @escaping NetworkCallbackProgress = { _,_ in },
                      result: @escaping NetworkCallbackResult) {
 
-        load(URLRequest.init(url: url), isDisk: isDisk, isStart: isStart, progress: progress, result: result)
+        load(URLRequest.init(url: url), isCache: isCache, isDisk: isDisk, isStart: isStart, progress: progress, result: result)
     }
     
     /**
      加载
      
      - parameter    request:    URL请求
-     - parameter    isDisk:     是否磁盘存储
+     - parameter    isCache:    是否缓存
+     - parameter    isDisk:     是否磁盘存储(存储磁盘则不缓存)
      - parameter    isStart:    是否立即开始
      - parameter    callbackID: 回调ID(用于取消 progress、result)
      - parameter    progress:   进度  (当前字节,总字节)
      - parameter    result:     结果  (错误信息,数据(isDisk = false 有值),数据路径(isDisk = true 有值))
      */
     public func load(_ request: URLRequest,
+                     isCache: Bool = false,
                      isDisk: Bool = false,
                      isStart: Bool = true,
                      callbackID: String = "\(Date.init().timeIntervalSince1970)-\(arc4random())",
@@ -121,7 +127,7 @@ public class Network: NetworkOperationDelegate {
         
         if let key = NetworkOperation.key(request) {
             
-            let operation = NetworkOperation.init(key, request: request, path: isDisk ? (path + key) : nil, delegate: self)
+            let operation = NetworkOperation.init(key, request: request, isCache: isCache, path: isDisk ? (path + key) : nil, delegate: self)
             
             addCallback(key, id: callbackID, callback: (progress, result))
 

@@ -8,6 +8,12 @@
 
 import Foundation
 
+public extension Network {
+    
+    /// 图片网络
+    static let image = Network.init("NetworkImage", max: 3, directory: NSHomeDirectory() + "/Documents/Network/Image/")
+}
+
 #if os(iOS) || os(watchOS) || os(tvOS)
 
 import UIKit
@@ -15,9 +21,9 @@ import UIKit
 /**
  图片缓存
  */
-class UIImageCache: NSCache<NSString, UIImage> {
+public class UIImageCache: NSCache<NSString, UIImage> {
     
-    static let `default` = UIImageCache.init()
+    public static let `default` = UIImageCache.init()
     
     override init() {
         
@@ -32,6 +38,11 @@ class UIImageCache: NSCache<NSString, UIImage> {
     }
 }
 
+public extension DataCache {
+    
+    static let GIFDataCache = DataCache.init("GIFDataCache")
+}
+
 /**
  图片加载
  */
@@ -42,8 +53,8 @@ public extension UIImageView {
      
      - parameter    urlString:      地址字符串
      - parameter    defaultImage:   默认图片
+     - parameter    isCache:        是否缓存
      - parameter    isDisk:         是否磁盘存储
-     - parameter    isStart:        是否立即开始
      - parameter    progress:       进度  (当前字节,总字节)
      */
     func load(_ urlString: String,
@@ -63,8 +74,8 @@ public extension UIImageView {
      
      - parameter    url:            地址
      - parameter    defaultImage:   默认图片
+     - parameter    isCache:        是否缓存
      - parameter    isDisk:         是否磁盘存储
-     - parameter    isStart:        是否立即开始
      - parameter    progress:       进度  (当前字节,总字节)
      */
     func load(_ url: URL,
@@ -78,7 +89,15 @@ public extension UIImageView {
             if isCache {
                 
                 /// 获取缓存
-                if let cache = UIImageCache.default.object(forKey: url.absoluteString as NSString) {
+                if let gifCache = DataCache.GIFDataCache.get(url.absoluteString) {
+                    
+                    _ = self.gif(gifCache)
+                    
+                    progress(1,1)
+
+                    return
+                }
+                else if let cache = UIImageCache.default.object(forKey: url.absoluteString as NSString) {
                     
                     DispatchQueue.main.async {
                         
@@ -98,31 +117,112 @@ public extension UIImageView {
             
             let id = String.init(format: "%p", self)
             
-            Network.default.removeCallback(id)
+            Network.image.removeCallback(id)
             
-            Network.default.load(url, isDisk: true, isStart: true, callbackID: id, progress: progress) { [weak self] (error, data, path) in
+            Network.image.load(url, isCache: false, isDisk: isDisk, isStart: true, callbackID: id, progress: progress) { [weak self] (error, data, path) in
 
-                if let diskPath = path, let image = UIImage.init(contentsOfFile: diskPath) {
+                var urlData = data
+                
+                if let diskPath = path {
 
-                    UIImageCache.default.setObject(image, forKey: url.absoluteString as NSString)
-                    
-                    DispatchQueue.main.async {
-
-                        self?.image = image
+                    do {
+                        
+                        urlData = try Data.init(contentsOf: URL.init(fileURLWithPath: diskPath))
+                        
+                    } catch {
+                        
                     }
                 }
 
-                if let imageData = data, let image = UIImage.init(data: imageData) {
+                if let imageData = urlData {
 
-                    UIImageCache.default.setObject(image, forKey: url.absoluteString as NSString)
-
-                    DispatchQueue.main.async {
-
-                        self?.image = image
+                    if let count = self?.gif(imageData), count > 0 {
+                        
+                        if isCache {
+                            
+                            DataCache.GIFDataCache.add(url.absoluteString, data: imageData)
+                        }
+                    }
+                    else if let image = UIImage.init(data: imageData) {
+                        
+                        if isCache {
+                            
+                            UIImageCache.default.setObject(image, forKey: url.absoluteString as NSString)
+                        }
+                        
+                        DispatchQueue.main.async {
+                            
+                            self?.image = image
+                        }
                     }
                 }
             }
         }
+    }
+    
+    /**
+     GIF
+     
+     - parameter    data:   GIF数据
+     */
+    public func gif(_ data: Data) -> Int {
+        
+        /// 获取图片资源
+        guard let source = CGImageSourceCreateWithData(data as CFData, nil) else {
+            
+            return 0
+        }
+        
+        /// 获取图片数量
+        let count = CGImageSourceGetCount(source)
+        
+        var images: [UIImage] = []
+        var duration: TimeInterval = 0
+        
+        for i in 0..<count {
+            
+            /// 获取图片
+            guard let cgimage = CGImageSourceCreateImageAtIndex(source, i, nil) else {
+                
+                continue
+            }
+            
+            let image = UIImage.init(cgImage: cgimage)
+            
+            images.append(image)
+            
+            /// 获取时间
+            guard let properties = CGImageSourceCopyPropertiesAtIndex(source, i, nil) else {
+                
+                continue
+            }
+            
+            guard let gifDict = (properties as Dictionary)[kCGImagePropertyGIFDictionary] else {
+                
+                continue
+            }
+            
+            guard let time = (gifDict as? Dictionary<CFString, Any>)?[kCGImagePropertyGIFDelayTime] else {
+                
+                continue
+            }
+            
+            duration += (time as? TimeInterval) ?? 0
+        }
+        
+        DispatchQueue.main.async {
+            
+            if images.count > 0 {
+                
+                self.image = images[0]
+            }
+            
+            self.animationImages = images
+            self.animationDuration = duration
+            self.startAnimating()
+        }
+        
+        return images.count
     }
 }
 
@@ -138,8 +238,8 @@ public extension UIButton {
      - parameter    isBackground:   是否是背景图片
      - parameter    state:          状态
      - parameter    defaultImage:   默认图片
+     - parameter    isCache:        是否缓存
      - parameter    isDisk:         是否磁盘存储
-     - parameter    isStart:        是否立即开始
      - parameter    progress:       进度  (当前字节,总字节)
      */
     func load(_ urlString: String,
@@ -163,8 +263,8 @@ public extension UIButton {
      - parameter    isBackground:   是否是背景图片
      - parameter    state:          状态
      - parameter    defaultImage:   默认图片
+     - parameter    isCache:        是否缓存
      - parameter    isDisk:         是否磁盘存储
-     - parameter    isStart:        是否立即开始
      - parameter    progress:       进度  (当前字节,总字节)
      */
     func load(_ url: URL,
@@ -214,30 +314,29 @@ public extension UIButton {
             
             let id = String.init(format: "%p-\(isBackground ? "background" : "")-\(state.rawValue)", self)
             
-            Network.default.removeCallback(id)
+            Network.image.removeCallback(id)
             
-            Network.default.load(url, isDisk: true, isStart: true, callbackID: id, progress: progress) { [weak self] (error, data, path) in
+            Network.image.load(url, isCache: false, isDisk: isDisk, isStart: true, callbackID: id, progress: progress) { [weak self] (error, data, path) in
                 
-                if let diskPath = path, let image = UIImage.init(contentsOfFile: diskPath) {
+                var urlData = data
+                
+                if let diskPath = path {
                     
-                    UIImageCache.default.setObject(image, forKey: url.absoluteString as NSString)
-                    
-                    DispatchQueue.main.async {
+                    do {
                         
-                        if isBackground {
-                            
-                            self?.setBackgroundImage(image, for: state)
-                        }
-                        else {
-                            
-                            self?.setImage(image, for: state)
-                        }
+                        urlData = try Data.init(contentsOf: URL.init(fileURLWithPath: diskPath))
+                        
+                    } catch {
+                        
                     }
                 }
                 
-                if let imageData = data, let image = UIImage.init(data: imageData) {
+                if let imageData = urlData, let image = UIImage.init(data: imageData) {
                     
-                    UIImageCache.default.setObject(image, forKey: url.absoluteString as NSString)
+                    if isCache {
+                        
+                        UIImageCache.default.setObject(image, forKey: url.absoluteString as NSString)
+                    }
                     
                     DispatchQueue.main.async {
                         
@@ -263,9 +362,9 @@ import AppKit
 /**
  图片缓存
  */
-class NSImageCache: NSCache<NSString, NSImage> {
+public class NSImageCache: NSCache<NSString, NSImage> {
     
-    static let `default` = NSImageCache.init()
+    public static let `default` = NSImageCache.init()
     
     override init() {
         
@@ -282,8 +381,8 @@ public extension NSImageView {
      
      - parameter    urlString:      地址字符串
      - parameter    defaultImage:   默认图片
+     - parameter    isCache:        是否缓存
      - parameter    isDisk:         是否磁盘存储
-     - parameter    isStart:        是否立即开始
      - parameter    progress:       进度  (当前字节,总字节)
      */
     func load(_ urlString: String,
@@ -303,8 +402,8 @@ public extension NSImageView {
      
      - parameter    url:            地址
      - parameter    defaultImage:   默认图片
+     - parameter    isCache:        是否缓存
      - parameter    isDisk:         是否磁盘存储
-     - parameter    isStart:        是否立即开始
      - parameter    progress:       进度  (当前字节,总字节)
      */
     func load(_ url: URL,
@@ -338,23 +437,29 @@ public extension NSImageView {
             
             let id = String.init(format: "%p", self)
             
-            Network.default.removeCallback(id)
+            Network.image.removeCallback(id)
             
-            Network.default.load(url, isDisk: true, isStart: true, callbackID: id, progress: progress) { [weak self] (error, data, path) in
+            Network.image.load(url, isCache: false, isDisk: isDisk, isStart: true, callbackID: id, progress: progress) { [weak self] (error, data, path) in
                 
-                if let diskPath = path, let image = NSImage.init(contentsOfFile: diskPath) {
+                var urlData = data
+                
+                if let diskPath = path {
                     
-                    NSImageCache.default.setObject(image, forKey: url.absoluteString as NSString)
-                    
-                    DispatchQueue.main.async {
+                    do {
                         
-                        self?.image = image
+                        urlData = try Data.init(contentsOf: URL.init(fileURLWithPath: diskPath))
+                        
+                    } catch {
+                        
                     }
                 }
                 
-                if let imageData = data, let image = NSImage.init(data: imageData) {
+                if let imageData = urlData, let image = NSImage.init(data: imageData) {
                     
-                    NSImageCache.default.setObject(image, forKey: url.absoluteString as NSString)
+                    if isCache {
+                        
+                        NSImageCache.default.setObject(image, forKey: url.absoluteString as NSString)
+                    }
                     
                     DispatchQueue.main.async {
                         
@@ -378,8 +483,8 @@ public extension NSButton {
      - parameter    isAlternate:    是否是替代图片
      - parameter    state:          状态
      - parameter    defaultImage:   默认图片
+     - parameter    isCache:        是否缓存
      - parameter    isDisk:         是否磁盘存储
-     - parameter    isStart:        是否立即开始
      - parameter    progress:       进度  (当前字节,总字节)
      */
     func load(_ urlString: String,
@@ -401,8 +506,8 @@ public extension NSButton {
      - parameter    url:            地址
      - parameter    isAlternate:    是否是替代图片
      - parameter    defaultImage:   默认图片
+     - parameter    isCache:        是否缓存
      - parameter    isDisk:         是否磁盘存储
-     - parameter    isStart:        是否立即开始
      - parameter    progress:       进度  (当前字节,总字节)
      */
     func load(_ url: URL,
@@ -451,30 +556,29 @@ public extension NSButton {
             
             let id = String.init(format: "%p-\(isAlternate ? "isAlternate" : "")", self)
             
-            Network.default.removeCallback(id)
+            Network.image.removeCallback(id)
             
-            Network.default.load(url, isDisk: true, isStart: true, callbackID: id, progress: progress) { [weak self] (error, data, path) in
+            Network.image.load(url, isCache: false, isDisk: isDisk, isStart: true, callbackID: id, progress: progress) { [weak self] (error, data, path) in
                 
-                if let diskPath = path, let image = NSImage.init(contentsOfFile: diskPath) {
+                var urlData = data
+                
+                if let diskPath = path {
                     
-                    NSImageCache.default.setObject(image, forKey: url.absoluteString as NSString)
-                    
-                    DispatchQueue.main.async {
+                    do {
                         
-                        if isAlternate {
-                            
-                            self?.alternateImage = image
-                        }
-                        else {
-                            
-                            self?.image = image
-                        }
+                        urlData = try Data.init(contentsOf: URL.init(fileURLWithPath: diskPath))
+                        
+                    } catch {
+                        
                     }
                 }
                 
-                if let imageData = data, let image = NSImage.init(data: imageData) {
+                if let imageData = urlData, let image = NSImage.init(data: imageData) {
                     
-                    NSImageCache.default.setObject(image, forKey: url.absoluteString as NSString)
+                    if isCache {
+                        
+                        NSImageCache.default.setObject(image, forKey: url.absoluteString as NSString)
+                    }
                     
                     DispatchQueue.main.async {
                         

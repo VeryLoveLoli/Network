@@ -165,7 +165,7 @@ public extension UIImageView {
      
      - parameter    data:   GIF数据
      */
-    public func gif(_ data: Data) -> Int {
+    func gif(_ data: Data) -> Int {
         
         /// 获取图片资源
         guard let source = CGImageSourceCreateWithData(data as CFData, nil) else {

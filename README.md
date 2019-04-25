@@ -84,7 +84,7 @@ self.imageView.load("https://i0.hdslb.com/bfs/archive/5e889fec08dab8cd8f7c6cc047
 图片预加载 (必须磁盘存储，`UIImageView`、`NSImageView`等使用的缓存和`Network`不一样)
 
 ```swift
-Network.image.load("http://i0.hdslb.com/bfs/archive/24e031e495699e234526586deb80c65d337cbe4d.png", isCache: false, isDisk: true) { (_, _, _) in }
+Network.image.load("http://i0.hdslb.com/bfs/archive/24e031e495699e234526586deb80c65d337cbe4d.png", isCache: false, isDisk: true, isStart: false) { (_, _, _) in }
 ```
 
 ### `Socket`

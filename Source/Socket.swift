@@ -275,7 +275,7 @@ public class Socket {
     /**
      绑定
      */
-    private func bindAddress() -> Int32 {
+    public func bindAddress() -> Int32 {
         
         var addr = Address.init("127.0.0.1", port: port).sockaddrStruct()
         
@@ -342,6 +342,20 @@ public class Socket {
             self.callbackLock.unlock()
         }
     }
+    
+    /**
+     删除所有回调
+     
+     */
+    public func removeAllCallback() {
+        
+        SocketQueue.concurrent.async {
+            
+            self.callbackLock.lock()
+            self.callback.removeAll()
+            self.callbackLock.unlock()
+        }
+    }
 }
 
 /**
@@ -359,17 +373,6 @@ public class UDP: Socket {
     public static func `default`(_ port: UInt16 = 0) -> Self? {
         
         return self.default(port, type: .udp)
-    }
-    
-    /**
-     初始化 UDP
-     
-     - parameter    id:         socket
-     - parameter    port:       端口
-     */
-    public convenience init(_ id: Int32, port: UInt16 = 0) {
-        
-        self.init(id, port: port, type: .udp)
     }
     
     // MARK: - socket
@@ -481,6 +484,12 @@ public class TCP: Socket {
 
         return self.default(port, type: .tcp)
     }
+}
+
+/**
+ TCP Client
+ */
+public class TCPClient: TCP {
     
     /**
      初始化 TCP
@@ -488,16 +497,10 @@ public class TCP: Socket {
      - parameter    id:         socket
      - parameter    port:       端口
      */
-    public convenience init(_ id: Int32, port: UInt16 = 0) {
-
+    fileprivate convenience init(_ id: Int32, port: UInt16 = 0) {
+        
         self.init(id, port: port, type: .tcp)
     }
-}
-
-/**
- TCP Client
- */
-public class TCPClient: TCP {
     
     // MARK: - socket
     
@@ -675,6 +678,22 @@ public class TCPServer: TCP {
             self.clientLock.lock()
             let client = self.clientDict.removeValue(forKey: address.ip + ":\(address.port)")
             client?.cancel()
+            self.clientLock.unlock()
+        }
+    }
+    
+    /**
+     删除所有客户
+     */
+    public func removeAllClient() {
+        
+        SocketQueue.concurrent.async {
+            
+            self.clientLock.lock()
+            for (key, client) in self.clientDict {
+                self.clientDict.removeValue(forKey: key)
+                client.cancel()
+            }
             self.clientLock.unlock()
         }
     }

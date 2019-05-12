@@ -506,18 +506,21 @@ public class Network: NetworkOperationDelegate {
         
         callbackResult(key, error: error, data: nil, path: nil)
         remove(key)
+        nextRun()
     }
     
     func operation(_ key: String, data: Data) {
         
         callbackResult(key, error: nil, data: data, path: nil)
         remove(key)
+        nextRun()
     }
     
     func operation(_ key: String, path: String) {
         
         callbackResult(key, error: nil, data: nil, path: path)
         remove(key)
+        nextRun()
     }
 }
 

@@ -312,6 +312,7 @@ class NetworkOperation: Operation, URLSessionDelegate, URLSessionTaskDelegate, U
     
     // MARK: - URLSessionTaskDelegate
     
+    /*
     /**
      将开始延时请求
      */
@@ -320,6 +321,14 @@ class NetworkOperation: Operation, URLSessionDelegate, URLSessionTaskDelegate, U
         /// 处理
         completionHandler(.continueLoading, request)
     }
+    
+    /**
+     等待连接
+     */
+    func urlSession(_ session: URLSession, taskIsWaitingForConnectivity task: URLSessionTask) {
+        
+    }
+    */
     
     /**
      已发送数据的大小
@@ -343,13 +352,6 @@ class NetworkOperation: Operation, URLSessionDelegate, URLSessionTaskDelegate, U
     func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse, newRequest request: URLRequest, completionHandler: @escaping (URLRequest?) -> Void) {
         
         completionHandler(request)
-    }
-    
-    /**
-     等待连接
-     */
-    func urlSession(_ session: URLSession, taskIsWaitingForConnectivity task: URLSessionTask) {
-        
     }
     
     /**

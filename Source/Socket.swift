@@ -205,16 +205,16 @@ public typealias SocketCallback = (Address, [UInt8], Int)->Void
 /**
  Socket
  */
-public class Socket {
+open class Socket {
     
     /// 端口
-    public private(set) var port: UInt16
+    open private(set) var port: UInt16
     /// 连接类型
     public let type: SocketConnectType
     /// Socket句柄
-    public private(set) var id: Int32
+    open private(set) var id: Int32
     /// 连接状态
-    public var status: Int32 { return fcntl(id, F_GETFL, 0)}
+    open var status: Int32 { return fcntl(id, F_GETFL, 0)}
     /// 发送数据锁
     internal var sendLock = NSLock.init()
     /// 回调字典
@@ -255,7 +255,7 @@ public class Socket {
      - parameter    port:       端口
      - parameter    type:       连接类型
      */
-    internal required init(_ id: Int32, port: UInt16, type: SocketConnectType) {
+    public required init(_ id: Int32, port: UInt16, type: SocketConnectType) {
         
         self.port = port
         self.type = type
@@ -265,7 +265,7 @@ public class Socket {
     /**
      取消
      */
-    public func cancel() {
+    open func cancel() {
         
         close(id)
     }
@@ -275,7 +275,7 @@ public class Socket {
     /**
      绑定
      */
-    public func bindAddress() -> Int32 {
+    open func bindAddress() -> Int32 {
         
         var addr = Address.init("127.0.0.1", port: port).sockaddrStruct()
         
@@ -300,7 +300,7 @@ public class Socket {
      - parameter    rcvbuf:     读取缓冲
      - parameter    sndbuf:     发送缓冲
      */
-    public func socketBuf(_ rcvbuf: UInt32 = 1024*1024, sndbuf: UInt32 = 1024*1024) {
+    open func socketBuf(_ rcvbuf: UInt32 = 1024*1024, sndbuf: UInt32 = 1024*1024) {
         
         /// 读取缓冲
         var RCVBUF = rcvbuf
@@ -318,7 +318,7 @@ public class Socket {
      - parameter    key:        标识
      - parameter    callback:   Socket 回调   (地址,字节,读取状态)
      */
-    public func addCallback(_ key: String, callback: @escaping SocketCallback) {
+    open func addCallback(_ key: String, callback: @escaping SocketCallback) {
         
         SocketQueue.concurrent.async {
             
@@ -333,7 +333,7 @@ public class Socket {
      
      - parameter    key:        标识
      */
-    public func removeCallback(_ key: String) {
+    open func removeCallback(_ key: String) {
         
         SocketQueue.concurrent.async {
             
@@ -347,7 +347,7 @@ public class Socket {
      删除所有回调
      
      */
-    public func removeAllCallback() {
+    open func removeAllCallback() {
         
         SocketQueue.concurrent.async {
             
@@ -361,7 +361,7 @@ public class Socket {
 /**
  UDP Socket
  */
-public class UDP: Socket {
+open class UDP: Socket {
     
     // MARK: - init
 
@@ -380,7 +380,7 @@ public class UDP: Socket {
     /**
      等待字节
      */
-    public func waitBytes() {
+    open func waitBytes() {
         
         SocketQueue.concurrent.async {
             
@@ -417,7 +417,7 @@ public class UDP: Socket {
      - parameter    data:           发送的数据
      - parameter    statusCode:     状态码 sendto()函数的返回值
      */
-    public func sendtoData(_ address: Address, data: Data, statusCode: @escaping (Int)->Void) {
+    open func sendtoData(_ address: Address, data: Data, statusCode: @escaping (Int)->Void) {
         
         sendtoBytes(address, bytes: [UInt8].init(data), statusCode: statusCode)
     }
@@ -429,7 +429,7 @@ public class UDP: Socket {
      - parameter    bytes:          发送的字节
      - parameter    statusCode:     状态码 sendto()函数的返回值
      */
-    public func sendtoBytes(_ address: Address, bytes: [UInt8], statusCode: @escaping (Int)->Void) {
+    open func sendtoBytes(_ address: Address, bytes: [UInt8], statusCode: @escaping (Int)->Void) {
         
         SocketQueue.concurrent.async {
             
@@ -470,10 +470,10 @@ public protocol TCPSocketBytesProcess {
 /**
  TCP Socket
  */
-public class TCP: Socket {
+open class TCP: Socket {
     
     /// 字节处理
-    public var bytesProcess: TCPSocketBytesProcess?
+    open var bytesProcess: TCPSocketBytesProcess?
 
     /**
      创建 TCP
@@ -489,7 +489,7 @@ public class TCP: Socket {
 /**
  TCP Client
  */
-public class TCPClient: TCP {
+open class TCPClient: TCP {
     
     /**
      初始化 TCP
@@ -510,7 +510,7 @@ public class TCPClient: TCP {
      - parameter    address:        地址
      - parameter    statusCode:     状态码 connect()函数的返回值
      */
-    public func connection(_ address: Address, statusCode: @escaping (Int32)->Void) {
+    open func connection(_ address: Address, statusCode: @escaping (Int32)->Void) {
         
         SocketQueue.concurrent.async {
             
@@ -530,7 +530,7 @@ public class TCPClient: TCP {
     /**
      等待字节
      */
-    public func waitBytes() {
+    open func waitBytes() {
         
         SocketQueue.concurrent.async {
             
@@ -581,7 +581,7 @@ public class TCPClient: TCP {
      - parameter    repeatCount:    失败重发次数
      - parameter    statusCode:     状态码 send()函数的返回值
      */
-    public func sendData(_ data: Data, repeatCount: Int = 0, statusCode: @escaping (Int)->Void) {
+    open func sendData(_ data: Data, repeatCount: Int = 0, statusCode: @escaping (Int)->Void) {
         
         sendBytes([UInt8].init(data), repeatCount: repeatCount, statusCode: statusCode)
     }
@@ -593,7 +593,7 @@ public class TCPClient: TCP {
      - parameter    repeatCount:    失败重发次数
      - parameter    statusCode:     状态码 send()函数的返回值
      */
-    public func sendBytes(_ bytes: [UInt8], repeatCount: Int = 0, statusCode: @escaping (Int)->Void) {
+    open func sendBytes(_ bytes: [UInt8], repeatCount: Int = 0, statusCode: @escaping (Int)->Void) {
         
         SocketQueue.concurrent.async {
             
@@ -641,7 +641,7 @@ public class TCPClient: TCP {
 /**
  TCP Server
  */
-public class TCPServer: TCP {
+open class TCPServer: TCP {
     
     /// 客户字典
     private var clientDict: [String: TCPClient] = [:]
@@ -656,7 +656,7 @@ public class TCPServer: TCP {
      - parameter    address:    地址
      - parameter    client:     客户
      */
-    public func addClient(_ address: Address, client: TCPClient) {
+    open func addClient(_ address: Address, client: TCPClient) {
         
         SocketQueue.concurrent.async {
             
@@ -671,7 +671,7 @@ public class TCPServer: TCP {
      
      - parameter    address:    地址
      */
-    public func removeClient(_ address: Address) {
+    open func removeClient(_ address: Address) {
         
         SocketQueue.concurrent.async {
             
@@ -685,7 +685,7 @@ public class TCPServer: TCP {
     /**
      删除所有客户
      */
-    public func removeAllClient() {
+    open func removeAllClient() {
         
         SocketQueue.concurrent.async {
             
@@ -703,7 +703,7 @@ public class TCPServer: TCP {
     /**
      监听客户端连接
      */
-    public func listenClientConnect() {
+    open func listenClientConnect() {
         
         SocketQueue.concurrent.async {
             
@@ -762,7 +762,7 @@ public class TCPServer: TCP {
      - parameter    repeatCount:    失败重发次数
      - parameter    statusCode:     状态码 send()函数的返回值; -99999: 客户未连接
      */
-    public func sendClient(_ address: Address, data: Data, repeatCount: Int = 0, statusCode: @escaping (Int)->Void) {
+    open func sendClient(_ address: Address, data: Data, repeatCount: Int = 0, statusCode: @escaping (Int)->Void) {
         
         sendClient(address, bytes: [UInt8].init(data), repeatCount: repeatCount, statusCode: statusCode)
     }
@@ -775,7 +775,7 @@ public class TCPServer: TCP {
      - parameter    repeatCount:    失败重发次数
      - parameter    statusCode:     状态码 send()函数的返回值; -99999: 客户未连接
      */
-    public func sendClient(_ address: Address, bytes: [UInt8], repeatCount: Int = 0, statusCode: @escaping (Int)->Void) {
+    open func sendClient(_ address: Address, bytes: [UInt8], repeatCount: Int = 0, statusCode: @escaping (Int)->Void) {
         
         SocketQueue.concurrent.async {
             

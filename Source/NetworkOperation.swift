@@ -15,7 +15,7 @@ import UIKit
 /**
  数据缓存
  */
-public class DataCache {
+open class DataCache {
     
     /// 默认数据缓存
     public static let `default` = DataCache.init("DataCache")
@@ -43,7 +43,7 @@ public class DataCache {
     
     // MARK: - Data
     
-    public func get(_ key: String) -> Data? {
+    open func get(_ key: String) -> Data? {
         
         let dispatchSemaphore = DispatchSemaphore.init(value: 0)
         
@@ -60,7 +60,7 @@ public class DataCache {
         return data
     }
     
-    public func add(_ key: String, data: Data) {
+    open func add(_ key: String, data: Data) {
         
         serialQueue.async {
             
@@ -68,7 +68,7 @@ public class DataCache {
         }
     }
     
-    public func remove(_ key: String) {
+    open func remove(_ key: String) {
         
         serialQueue.async {
             
@@ -76,7 +76,7 @@ public class DataCache {
         }
     }
     
-    public func removeAll() {
+    open func removeAll() {
         
         serialQueue.async {
             
@@ -88,7 +88,7 @@ public class DataCache {
 /**
  网络操作协议
  */
-protocol NetworkOperationDelegate {
+public protocol NetworkOperationDelegate {
     
     /**
      进度
@@ -114,26 +114,26 @@ protocol NetworkOperationDelegate {
 /**
  网络操作
  */
-class NetworkOperation: Operation, URLSessionDelegate, URLSessionTaskDelegate, URLSessionDataDelegate, URLSessionDownloadDelegate {
+open class NetworkOperation: Operation, URLSessionDelegate, URLSessionTaskDelegate, URLSessionDataDelegate, URLSessionDownloadDelegate {
     
     /// 信号量
-    let dispatchSemaphore = DispatchSemaphore.init(value: 0)
+    public let dispatchSemaphore = DispatchSemaphore.init(value: 0)
     /// 标识
-    let key: String
+    public let key: String
     /// URL请求
-    var request: URLRequest
+    open var request: URLRequest
     /// 会话
-    var session: URLSession?
+    open var session: URLSession?
     /// 任务
-    var task: URLSessionTask?
+    open var task: URLSessionTask?
     /// 协议
-    var delegate: NetworkOperationDelegate?
+    open var delegate: NetworkOperationDelegate?
     /// 数据
-    var data = Data()
+    open var data = Data()
     /// 是否缓存
-    var isCache: Bool
+    open var isCache: Bool
     /// 保存地址
-    var path: String?
+    open var path: String?
     /// 文件Handle
     private var fileHandle: FileHandle?
     
@@ -144,7 +144,7 @@ class NetworkOperation: Operation, URLSessionDelegate, URLSessionTaskDelegate, U
      
      - parameter    urlString:  地址字符串
      */
-    static func key(_ urlString: String) -> String? {
+    public static func key(_ urlString: String) -> String? {
         
         if let url = URL.init(string: urlString) {
             
@@ -159,7 +159,7 @@ class NetworkOperation: Operation, URLSessionDelegate, URLSessionTaskDelegate, U
      
      - parameter    url:        地址
      */
-    static func key(_ url: URL) -> String? {
+    public static func key(_ url: URL) -> String? {
         
         return key(URLRequest.init(url: url))
     }
@@ -169,7 +169,7 @@ class NetworkOperation: Operation, URLSessionDelegate, URLSessionTaskDelegate, U
      
      - parameter    request:    请求
      */
-    static func key(_ request: URLRequest) -> String? {
+    public static func key(_ request: URLRequest) -> String? {
         
         if let url = request.url, let data = url.absoluteString.data(using: .utf8) {
             
@@ -190,7 +190,7 @@ class NetworkOperation: Operation, URLSessionDelegate, URLSessionTaskDelegate, U
      - parameter    path:       磁盘路径(如果 path != nil 则 存储磁盘，并且不缓存数据)
      - parameter    delegate:   网络操作协议
      */
-    init(_ key: String, request: URLRequest, isCache: Bool = false, path: String? = nil, delegate: NetworkOperationDelegate? = nil) {
+    public init(_ key: String, request: URLRequest, isCache: Bool = false, path: String? = nil, delegate: NetworkOperationDelegate? = nil) {
         
         self.key = key
         self.request = request
@@ -202,7 +202,7 @@ class NetworkOperation: Operation, URLSessionDelegate, URLSessionTaskDelegate, U
     /**
      操作主体，isExecuting/isFinished 是 main() 的状态
      */
-    override func main() {
+    override open func main() {
         
         /// 断点下载
         if let path = self.path {
@@ -277,7 +277,7 @@ class NetworkOperation: Operation, URLSessionDelegate, URLSessionTaskDelegate, U
         task = nil
     }
     
-    override func cancel() {
+    override open func cancel() {
         super.cancel()
         
         dispatchSemaphore.signal()
@@ -288,14 +288,14 @@ class NetworkOperation: Operation, URLSessionDelegate, URLSessionTaskDelegate, U
     /**
      失效
      */
-    func urlSession(_ session: URLSession, didBecomeInvalidWithError error: Error?) {
+    open func urlSession(_ session: URLSession, didBecomeInvalidWithError error: Error?) {
         
     }
     
     /**
      收到权限认证
      */
-    func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+    open func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
         
         /// 处理
         completionHandler(.performDefaultHandling, challenge.proposedCredential)
@@ -305,7 +305,7 @@ class NetworkOperation: Operation, URLSessionDelegate, URLSessionTaskDelegate, U
      后台下载完成
      */
     #if os(iOS) || os(watchOS) || os(tvOS)
-    func urlSessionDidFinishEvents(forBackgroundURLSession session: URLSession) {
+    open func urlSessionDidFinishEvents(forBackgroundURLSession session: URLSession) {
         
     }
     #endif
@@ -333,14 +333,14 @@ class NetworkOperation: Operation, URLSessionDelegate, URLSessionTaskDelegate, U
     /**
      已发送数据的大小
      */
-    func urlSession(_ session: URLSession, task: URLSessionTask, didSendBodyData bytesSent: Int64, totalBytesSent: Int64, totalBytesExpectedToSend: Int64) {
+    open func urlSession(_ session: URLSession, task: URLSessionTask, didSendBodyData bytesSent: Int64, totalBytesSent: Int64, totalBytesExpectedToSend: Int64) {
         
     }
     
     /**
      收到权限认证
      */
-    func urlSession(_ session: URLSession, task: URLSessionTask, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+    open func urlSession(_ session: URLSession, task: URLSessionTask, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
         
         /// 处理
         completionHandler(.performDefaultHandling, challenge.proposedCredential)
@@ -349,7 +349,7 @@ class NetworkOperation: Operation, URLSessionDelegate, URLSessionTaskDelegate, U
     /**
      将重定向请求
      */
-    func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse, newRequest request: URLRequest, completionHandler: @escaping (URLRequest?) -> Void) {
+    open func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse, newRequest request: URLRequest, completionHandler: @escaping (URLRequest?) -> Void) {
         
         completionHandler(request)
     }
@@ -357,7 +357,7 @@ class NetworkOperation: Operation, URLSessionDelegate, URLSessionTaskDelegate, U
     /**
      需要新的流
      */
-    func urlSession(_ session: URLSession, task: URLSessionTask, needNewBodyStream completionHandler: @escaping (InputStream?) -> Void) {
+    open func urlSession(_ session: URLSession, task: URLSessionTask, needNewBodyStream completionHandler: @escaping (InputStream?) -> Void) {
         
         completionHandler(nil)
     }
@@ -365,14 +365,14 @@ class NetworkOperation: Operation, URLSessionDelegate, URLSessionTaskDelegate, U
     /**
      完成收集
      */
-    func urlSession(_ session: URLSession, task: URLSessionTask, didFinishCollecting metrics: URLSessionTaskMetrics) {
+    open func urlSession(_ session: URLSession, task: URLSessionTask, didFinishCollecting metrics: URLSessionTaskMetrics) {
         
     }
     
     /**
      完成/错误
      */
-    func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+    open func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
         
         if let e = error {
             
@@ -403,7 +403,7 @@ class NetworkOperation: Operation, URLSessionDelegate, URLSessionTaskDelegate, U
     /**
      收到响应
      */
-    func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse, completionHandler: @escaping (URLSession.ResponseDisposition) -> Void) {
+    open func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse, completionHandler: @escaping (URLSession.ResponseDisposition) -> Void) {
         
         delegate?.operation(key, received: dataTask.countOfBytesReceived, expectedToReceive: dataTask.countOfBytesExpectedToReceive)
         
@@ -414,7 +414,7 @@ class NetworkOperation: Operation, URLSessionDelegate, URLSessionTaskDelegate, U
     /**
      收到数据
      */
-    func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
+    open func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
         
         if path == nil {
             
@@ -433,21 +433,21 @@ class NetworkOperation: Operation, URLSessionDelegate, URLSessionTaskDelegate, U
     /**
      开始下载任务
      */
-    func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didBecome downloadTask: URLSessionDownloadTask) {
+    open func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didBecome downloadTask: URLSessionDownloadTask) {
         
     }
     
     /**
      开始流任务
      */
-    func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didBecome streamTask: URLSessionStreamTask) {
+    open func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didBecome streamTask: URLSessionStreamTask) {
         
     }
     
     /**
      将缓存响应
      */
-    func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, willCacheResponse proposedResponse: CachedURLResponse, completionHandler: @escaping (CachedURLResponse?) -> Void) {
+    open func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, willCacheResponse proposedResponse: CachedURLResponse, completionHandler: @escaping (CachedURLResponse?) -> Void) {
         
         /// 处理
         completionHandler(proposedResponse)
@@ -458,21 +458,21 @@ class NetworkOperation: Operation, URLSessionDelegate, URLSessionTaskDelegate, U
     /**
      下载进度
      */
-    func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
+    open func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
         
     }
     
     /**
      下载完成
      */
-    func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
+    open func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
         
     }
     
     /**
      下载偏移
      */
-    func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didResumeAtOffset fileOffset: Int64, expectedTotalBytes: Int64) {
+    open func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didResumeAtOffset fileOffset: Int64, expectedTotalBytes: Int64) {
         
     }
 }

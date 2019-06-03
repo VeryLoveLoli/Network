@@ -21,11 +21,11 @@ import UIKit
 /**
  图片缓存
  */
-public class UIImageCache: NSCache<NSString, UIImage> {
+open class UIImageCache: NSCache<NSString, UIImage> {
     
     public static let `default` = UIImageCache.init()
     
-    override init() {
+    override public init() {
         
         super.init()
         
@@ -362,11 +362,11 @@ import AppKit
 /**
  图片缓存
  */
-public class NSImageCache: NSCache<NSString, NSImage> {
+open class NSImageCache: NSCache<NSString, NSImage> {
     
     public static let `default` = NSImageCache.init()
     
-    override init() {
+    override public init() {
         
         super.init()
         

@@ -18,7 +18,7 @@ public typealias NetworkCallback = (NetworkCallbackProgress, NetworkCallbackResu
 /**
  网络
  */
-public class Network: NetworkOperationDelegate {
+open class Network: NetworkOperationDelegate {
     
     /// 默认网络
     public static let `default` = Network.init()
@@ -36,9 +36,9 @@ public class Network: NetworkOperationDelegate {
     /// 回调字典
     private var callback: [String: NetworkCallback] = [:]
     /// 最大并发数量
-    public var maxConcurrent = Int.max { didSet { exceedMaxRunToWait(); nextRun() } }
+    open var maxConcurrent = Int.max { didSet { exceedMaxRunToWait(); nextRun() } }
     /// 磁盘文件夹路径
-    public private(set) var path: String
+    open private(set) var path: String
     
     // MARK: - init
     
@@ -70,7 +70,7 @@ public class Network: NetworkOperationDelegate {
      - parameter    progress:   进度  (当前字节,总字节)
      - parameter    result:     结果  (错误信息,数据(isDisk = false 有值),数据路径(isDisk = true 有值))
      */
-    public func load(_ urlString: String,
+    open func load(_ urlString: String,
                      isCache: Bool = false,
                      isDisk: Bool = false,
                      isStart: Bool = true,
@@ -95,7 +95,7 @@ public class Network: NetworkOperationDelegate {
      - parameter    progress:   进度  (当前字节,总字节)
      - parameter    result:     结果  (错误信息,数据(isDisk = false 有值),数据路径(isDisk = true 有值))
      */
-    public func load(_ url: URL,
+    open func load(_ url: URL,
                      isCache: Bool = false,
                      isDisk: Bool = false,
                      isStart: Bool = true,
@@ -117,7 +117,7 @@ public class Network: NetworkOperationDelegate {
      - parameter    progress:   进度  (当前字节,总字节)
      - parameter    result:     结果  (错误信息,数据(isDisk = false 有值),数据路径(isDisk = true 有值))
      */
-    public func load(_ request: URLRequest,
+    open func load(_ request: URLRequest,
                      isCache: Bool = false,
                      isDisk: Bool = false,
                      isStart: Bool = true,
@@ -219,7 +219,7 @@ public class Network: NetworkOperationDelegate {
      
      - parameter    key:        操作标识    (外部调用需通过 NetworkOperation.key() 获取 )
      */
-    public func remove(_ key: String) {
+    open func remove(_ key: String) {
         
         self.serialQueue.async {
             
@@ -361,7 +361,7 @@ public class Network: NetworkOperationDelegate {
      
      - parameter    id:         回调ID    (外部调用需在 load() 时 设置)
      */
-    public func removeCallback(_ id: String) {
+    open func removeCallback(_ id: String) {
         
         self.serialQueue.async {
             
@@ -452,7 +452,7 @@ public class Network: NetworkOperationDelegate {
      
      - parameter    key:        操作标识    (外部调用需通过 NetworkOperation.key() 获取 )
      */
-    public func removeDiskFile(_ key: String) {
+    open func removeDiskFile(_ key: String) {
         
         self.concurrentQueue.async {
             
@@ -472,7 +472,7 @@ public class Network: NetworkOperationDelegate {
     /**
      删除所有磁盘文件
      */
-    public func removeAllDiskFile() {
+    open func removeAllDiskFile() {
         
         self.concurrentQueue.async {
             
@@ -497,26 +497,26 @@ public class Network: NetworkOperationDelegate {
     
     // MARK: - NetworkOperationDetegate
     
-    func operation(_ key: String, received: Int64, expectedToReceive: Int64) {
+    open func operation(_ key: String, received: Int64, expectedToReceive: Int64) {
         
         callbackProgress(key, current: received, total: expectedToReceive)
     }
     
-    func operation(_ key: String, error: Error) {
+    open func operation(_ key: String, error: Error) {
         
         callbackResult(key, error: error, data: nil, path: nil)
         remove(key)
         nextRun()
     }
     
-    func operation(_ key: String, data: Data) {
+    open func operation(_ key: String, data: Data) {
         
         callbackResult(key, error: nil, data: data, path: nil)
         remove(key)
         nextRun()
     }
     
-    func operation(_ key: String, path: String) {
+    open func operation(_ key: String, path: String) {
         
         callbackResult(key, error: nil, data: nil, path: path)
         remove(key)

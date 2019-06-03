@@ -16,8 +16,8 @@ Pod::Spec.new do |s|
   #
 
   s.name         = "Network"
-  s.version      = "0.0.2"
-  s.summary      = "swift Network"
+  s.version      = "1.0-master"
+  s.summary      = "Swift Network"
 
   # This description is used to generate tags and improve search results.
   #   * Think: What does it do? Why did you write it? What is the focus?
@@ -25,7 +25,7 @@ Pod::Spec.new do |s|
   #   * Write the description between the DESC delimiters below.
   #   * Finally, don't worry about the indent, CocoaPods strips it!
   s.description  = <<-DESC
-                      swift Network
+                      Swift Network HTTP/Socket/Image
                    DESC
 
   s.homepage     = "https://github.com/VeryLoveLoli/Network"
@@ -81,7 +81,7 @@ Pod::Spec.new do |s|
   #  Supports git, hg, bzr, svn and HTTP.
   #
 
-  s.source       = { :git => "https://github.com/VeryLoveLoli/Network.git", :tag => "#{s.version}" }
+  s.source       = { :git => "https://github.com/VeryLoveLoli/Network.git" }
 
 
   # ――― Source Code ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #

@@ -67,6 +67,10 @@ public extension UIImageView {
             
             load(url, defaultImage: defaultImage, isCache: isCache, isDisk: isDisk, progress: progress)
         }
+        else {
+            
+            image = defaultImage
+        }
     }
     
     /**
@@ -254,6 +258,17 @@ public extension UIButton {
             
             load(url, isBackground: isBackground, state: state, defaultImage: defaultImage, isCache: isCache, isDisk: isDisk, progress: progress)
         }
+        else {
+            
+            if isBackground {
+                
+                setBackgroundImage(defaultImage, for: state)
+            }
+            else {
+                
+                setImage(defaultImage, for: state)
+            }
+        }
     }
     
     /**
@@ -395,6 +410,10 @@ public extension NSImageView {
             
             load(url, defaultImage: defaultImage, isCache: isCache, isDisk: isDisk, progress: progress)
         }
+        else {
+            
+            image = defaultImage
+        }
     }
     
     /**
@@ -497,6 +516,17 @@ public extension NSButton {
         if let url = URL.init(string: urlString) {
             
             load(url, isAlternate: isAlternate, defaultImage: defaultImage, isCache: isCache, isDisk: isDisk, progress: progress)
+        }
+        else {
+            
+            if isAlternate {
+                
+                alternateImage = defaultImage
+            }
+            else {
+                
+                image = defaultImage
+            }
         }
     }
     

@@ -405,6 +405,17 @@ open class NetworkOperation: Operation, URLSessionDelegate, URLSessionTaskDelega
      */
     open func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse, completionHandler: @escaping (URLSession.ResponseDisposition) -> Void) {
         
+        /// 是否支持断点下载
+        if let httpResponse = response as? HTTPURLResponse, httpResponse.allHeaderFields["Accept-Ranges"] != nil || httpResponse.allHeaderFields["Content-Range"] != nil {
+            
+        }
+        else {
+            
+            /// 清空缓存文件
+            fileHandle?.truncateFile(atOffset: 0)
+            fileHandle?.synchronizeFile()
+        }
+        
         delegate?.operation(key, received: dataTask.countOfBytesReceived, expectedToReceive: dataTask.countOfBytesExpectedToReceive)
         
         /// 处理

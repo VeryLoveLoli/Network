@@ -35,6 +35,8 @@ open class Network: NetworkOperationDelegate {
     private var requestCallback: [String: [String]] = [:]
     /// 回调字典
     private var callback: [String: NetworkCallback] = [:]
+    /// 回调与请求列表
+    private var callbackRequest: [String: [String]] = [:]
     /// 最大并发数量
     open var maxConcurrent = Int.max { didSet { exceedMaxRunToWait(); nextRun() } }
     /// 磁盘文件夹路径
@@ -80,7 +82,7 @@ open class Network: NetworkOperationDelegate {
 
         if let url = URL.init(string: urlString) {
             
-            load(url, isCache: isCache, isDisk: isDisk, isStart: isStart, progress: progress, result: result)
+            load(url, isCache: isCache, isDisk: isDisk, isStart: isStart, callbackID: callbackID, progress: progress, result: result)
         }
     }
     
@@ -103,7 +105,7 @@ open class Network: NetworkOperationDelegate {
                      progress: @escaping NetworkCallbackProgress = { _,_ in },
                      result: @escaping NetworkCallbackResult) {
 
-        load(URLRequest.init(url: url), isCache: isCache, isDisk: isDisk, isStart: isStart, progress: progress, result: result)
+        load(URLRequest.init(url: url), isCache: isCache, isDisk: isDisk, isStart: isStart, callbackID: callbackID, progress: progress, result: result)
     }
     
     /**
@@ -326,6 +328,15 @@ open class Network: NetworkOperationDelegate {
             
             self.callback[id] = callback
             
+            if self.callbackRequest[id] == nil {
+                
+                self.callbackRequest[id] = [key]
+            }
+            else {
+                
+                self.callbackRequest[id]?.append(key)
+            }
+            
             if self.requestCallback[key] == nil {
                 
                 self.requestCallback[key] = [id]
@@ -351,6 +362,24 @@ open class Network: NetworkOperationDelegate {
                 for id in callbackIDList {
                     
                     self.callback.removeValue(forKey: id)
+                    
+                    if let requestKeyList = self.callbackRequest.removeValue(forKey: id) {
+                        
+                        var list: [String] = []
+                        
+                        for item in requestKeyList {
+                            
+                            if item != key {
+                                
+                                list.append(item)
+                            }
+                        }
+                        
+                        if list.count != 0 {
+                            
+                            self.callbackRequest[id] = list
+                        }
+                    }
                 }
             }
         }
@@ -366,6 +395,30 @@ open class Network: NetworkOperationDelegate {
         self.serialQueue.async {
             
             self.callback.removeValue(forKey: id)
+            
+            if let requestKeyList = self.callbackRequest.removeValue(forKey: id) {
+                
+                for key in requestKeyList {
+                    
+                    if let callbackIdList = self.requestCallback.removeValue(forKey: key) {
+                        
+                        var list: [String] = []
+                        
+                        for item in callbackIdList {
+                            
+                            if item != id {
+                                
+                                list.append(item)
+                            }
+                        }
+                        
+                        if list.count != 0 {
+                            
+                            self.requestCallback[id] = list
+                        }
+                    }
+                }
+            }
         }
     }
     

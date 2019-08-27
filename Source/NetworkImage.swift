@@ -90,6 +90,10 @@ public extension UIImageView {
 
         DispatchQueue.global().async {
             
+            let id = String.init(format: "%p", self)
+            
+            Network.image.removeCallback(id)
+            
             if isCache {
                 
                 /// 获取缓存
@@ -119,10 +123,6 @@ public extension UIImageView {
                 self.image = defaultImage
             }
             
-            let id = String.init(format: "%p", self)
-            
-            Network.image.removeCallback(id)
-            
             Network.image.load(url, isCache: false, isDisk: isDisk, isStart: true, callbackID: id, progress: progress) { [weak self] (error, data, path) in
 
                 var urlData = data
@@ -144,7 +144,19 @@ public extension UIImageView {
                         
                         if isCache {
                             
-                            DataCache.GIFDataCache.add(url.absoluteString, data: imageData)
+                            if let image = UIImage.init(data: imageData), count == 1 {
+                                
+                                UIImageCache.default.setObject(image, forKey: url.absoluteString as NSString)
+                                
+                                DispatchQueue.main.async {
+                                    
+                                    self?.image = image
+                                }
+                            }
+                            else {
+                                
+                                DataCache.GIFDataCache.add(url.absoluteString, data: imageData)
+                            }
                         }
                     }
                     else if let image = UIImage.init(data: imageData) {
@@ -292,6 +304,10 @@ public extension UIButton {
         
         DispatchQueue.global().async {
             
+            let id = String.init(format: "%p-\(isBackground ? "background" : "")-\(state.rawValue)", self)
+            
+            Network.image.removeCallback(id)
+            
             if isCache {
                 
                 /// 获取缓存
@@ -326,10 +342,6 @@ public extension UIButton {
                     self.setImage(defaultImage, for: state)
                 }
             }
-            
-            let id = String.init(format: "%p-\(isBackground ? "background" : "")-\(state.rawValue)", self)
-            
-            Network.image.removeCallback(id)
             
             Network.image.load(url, isCache: false, isDisk: isDisk, isStart: true, callbackID: id, progress: progress) { [weak self] (error, data, path) in
                 
@@ -433,6 +445,10 @@ public extension NSImageView {
         
         DispatchQueue.global().async {
             
+            let id = String.init(format: "%p", self)
+            
+            Network.image.removeCallback(id)
+            
             if isCache {
                 
                 /// 获取缓存
@@ -453,10 +469,6 @@ public extension NSImageView {
                 
                 self.image = defaultImage
             }
-            
-            let id = String.init(format: "%p", self)
-            
-            Network.image.removeCallback(id)
             
             Network.image.load(url, isCache: false, isDisk: isDisk, isStart: true, callbackID: id, progress: progress) { [weak self] (error, data, path) in
                 
@@ -549,6 +561,10 @@ public extension NSButton {
         
         DispatchQueue.global().async {
             
+            let id = String.init(format: "%p-\(isAlternate ? "isAlternate" : "")", self)
+            
+            Network.image.removeCallback(id)
+            
             if isCache {
                 
                 /// 获取缓存
@@ -583,10 +599,6 @@ public extension NSButton {
                     self.image = defaultImage
                 }
             }
-            
-            let id = String.init(format: "%p-\(isAlternate ? "isAlternate" : "")", self)
-            
-            Network.image.removeCallback(id)
             
             Network.image.load(url, isCache: false, isDisk: isDisk, isStart: true, callbackID: id, progress: progress) { [weak self] (error, data, path) in
                 

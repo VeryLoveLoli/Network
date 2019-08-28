@@ -414,7 +414,7 @@ open class Network: NetworkOperationDelegate {
                         
                         if list.count != 0 {
                             
-                            self.requestCallback[id] = list
+                            self.requestCallback[key] = list
                         }
                     }
                 }

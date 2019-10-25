@@ -44,6 +44,13 @@ open class Network: NetworkOperationDelegate {
     
     // MARK: - init
     
+    /**
+     初始化
+     
+     - parameter    name:       队列名称
+     - parameter    max:        并发数
+     - parameter    directory:  存储文件夹
+     */
     public init(_ name: String, max: Int, directory: String) {
         
         concurrentQueue = DispatchQueue.init(label: name + ".concurrent", qos: .default, attributes: .concurrent, autoreleaseFrequency: .inherit, target: nil)
@@ -56,7 +63,7 @@ open class Network: NetworkOperationDelegate {
     
     private convenience init() {
         
-        self.init("Network", max: 3, directory: NSHomeDirectory() + "/Documents/Network/")
+        self.init("Network", max: Int.max, directory: NSHomeDirectory() + "/Documents/Network/")
     }
     
     // MARK: - Load

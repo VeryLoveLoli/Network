@@ -9,19 +9,6 @@
 import Foundation
 
 /**
- Socket 队列
- */
-public struct SocketQueue {
-    
-    /// 串行队列
-    public static let serial = DispatchQueue.init(label: "scoket.serial")
-    /// 并行队列
-    public static let concurrent = DispatchQueue.init(label: "scoket.concurrent", qos: .default, attributes: .concurrent, autoreleaseFrequency: .inherit, target: nil)
-    /// 任务组
-    public static let group = DispatchGroup()
-}
-
-/**
  Socket连接类型
  */
 public enum SocketConnectType {
@@ -215,12 +202,14 @@ open class Socket {
     open private(set) var id: Int32
     /// 连接状态
     open var status: Int32 { return fcntl(id, F_GETFL, 0)}
-    /// 发送数据锁
-    internal var sendLock = NSLock.init()
+    /// 串行队列（处理回调字典、回调闭包）
+    internal let serialQueue: DispatchQueue
+    /// 发送串行队列
+    internal let sendSerialQueue: DispatchQueue
+    /// 读取串行队列
+    internal let recvSerialQueue: DispatchQueue
     /// 回调字典
     internal var callback: [String: SocketCallback] = [:]
-    /// 回调字典锁
-    internal var callbackLock = NSLock.init()
     
     // MARK: - init
     
@@ -260,6 +249,11 @@ open class Socket {
         self.port = port
         self.type = type
         self.id = id
+        
+        let key = "\(Date.init().timeIntervalSince1970)-\(arc4random())"
+        serialQueue = DispatchQueue.init(label: "\(key).\(type).scoket.serial")
+        sendSerialQueue = DispatchQueue.init(label: "\(key).send.\(type).scoket.serial")
+        recvSerialQueue = DispatchQueue.init(label: "\(key).recv.\(type).scoket.serial")
     }
     
     /**
@@ -267,7 +261,23 @@ open class Socket {
      */
     open func cancel() {
         
-        close(id)
+        if status != -1 {
+            
+            var address: Address
+            
+            switch type {
+            case .tcp:
+                address = Address.init(peername: id)
+            default:
+                address = Address.init(sockname: id)
+            }
+            
+            broadcastCallback(address, bytes: [], code: 0)
+            
+            close(id)
+            
+            removeAllCallback()
+        }
     }
     
     // MARK: - socket
@@ -320,11 +330,9 @@ open class Socket {
      */
     open func addCallback(_ key: String, callback: @escaping SocketCallback) {
         
-        SocketQueue.concurrent.async {
+        serialQueue.async {
             
-            self.callbackLock.lock()
             self.callback[key] = callback
-            self.callbackLock.unlock()
         }
     }
     
@@ -335,11 +343,9 @@ open class Socket {
      */
     open func removeCallback(_ key: String) {
         
-        SocketQueue.concurrent.async {
+        serialQueue.async {
             
-            self.callbackLock.lock()
             self.callback.removeValue(forKey: key)
-            self.callbackLock.unlock()
         }
     }
     
@@ -349,11 +355,26 @@ open class Socket {
      */
     open func removeAllCallback() {
         
-        SocketQueue.concurrent.async {
+        serialQueue.async {
             
-            self.callbackLock.lock()
             self.callback.removeAll()
-            self.callbackLock.unlock()
+        }
+    }
+    
+    /**
+     广播回调
+     
+     - parameter    address:    地址
+     - parameter    bytes:      数据
+     - parameter    code:       读取状态
+     */
+    fileprivate func broadcastCallback(_ address: Address, bytes: [UInt8], code: Int) {
+        
+        serialQueue.async {
+            
+            for (_, callback) in self.callback {
+                callback(address, bytes, code)
+            }
         }
     }
 }
@@ -382,7 +403,7 @@ open class UDP: Socket {
      */
     open func waitBytes() {
         
-        SocketQueue.concurrent.async {
+        recvSerialQueue.async {
             
             var code : Int
             
@@ -396,15 +417,8 @@ open class UDP: Socket {
                 code = recvfrom(self.id, &bytes, bytes.count, 0, &addr, &len)
                 
                 let address = Address.init(addr: addr)
-
-                /// 广播回调
-                SocketQueue.concurrent.async {
-                    self.callbackLock.lock()
-                    for (_, callback) in self.callback {
-                        callback(address, bytes, code)
-                    }
-                    self.callbackLock.unlock()
-                }
+                
+                self.broadcastCallback(address, bytes: bytes, code: code)
                 
             } while code > 0
         }
@@ -431,17 +445,13 @@ open class UDP: Socket {
      */
     open func sendtoBytes(_ address: Address, bytes: [UInt8], statusCode: @escaping (Int)->Void) {
         
-        SocketQueue.concurrent.async {
-            
-            self.sendLock.lock()
+        sendSerialQueue.async {
             
             var addr = address.sockaddrStruct()
             
             var sendBytes = bytes
             
             let sendCode = sendto(self.id, &sendBytes, sendBytes.count, 0, &addr, UInt32(MemoryLayout.stride(ofValue: addr)))
-            
-            self.sendLock.unlock()
             
             statusCode(sendCode)
         }
@@ -512,7 +522,7 @@ open class TCPClient: TCP {
      */
     open func connection(_ address: Address, statusCode: @escaping (Int32)->Void) {
         
-        SocketQueue.concurrent.async {
+        sendSerialQueue.async {
             
             ///设置服务器地址
             var addr = address.sockaddrStruct()
@@ -532,7 +542,7 @@ open class TCPClient: TCP {
      */
     open func waitBytes() {
         
-        SocketQueue.concurrent.async {
+        recvSerialQueue.async {
             
             var code : Int
             
@@ -561,12 +571,11 @@ open class TCPClient: TCP {
                     let address = Address.init(peername: self.id)
 
                     /// 广播回调
-                    SocketQueue.concurrent.async {
-                        self.callbackLock.lock()
+                    self.serialQueue.async {
                         for (_, callback) in self.callback {
+                            // TODO: 并发?
                             callback(address, bytes, code)
                         }
-                        self.callbackLock.unlock()
                     }
                 }
                 
@@ -595,9 +604,7 @@ open class TCPClient: TCP {
      */
     open func sendBytes(_ bytes: [UInt8], repeatCount: Int = 0, statusCode: @escaping (Int)->Void) {
         
-        SocketQueue.concurrent.async {
-            
-            self.sendLock.lock()
+        sendSerialQueue.async {
             
             var index = 0
             
@@ -631,8 +638,6 @@ open class TCPClient: TCP {
                 
             } while index < bytes.count
             
-            self.sendLock.unlock()
-            
             statusCode(status)
         }
     }
@@ -644,9 +649,7 @@ open class TCPClient: TCP {
 open class TCPServer: TCP {
     
     /// 客户字典
-    private var clientDict: [String: TCPClient] = [:]
-    /// 客户锁
-    private let clientLock = NSLock.init()
+    private(set) var clientDict: [String: TCPClient] = [:]
     
     // MARK: - Client
     
@@ -658,11 +661,9 @@ open class TCPServer: TCP {
      */
     open func addClient(_ address: Address, client: TCPClient) {
         
-        SocketQueue.concurrent.async {
+        serialQueue.async {
             
-            self.clientLock.lock()
             self.clientDict[address.ip + ":\(address.port)"] = client
-            self.clientLock.unlock()
         }
     }
     
@@ -673,12 +674,10 @@ open class TCPServer: TCP {
      */
     open func removeClient(_ address: Address) {
         
-        SocketQueue.concurrent.async {
+        serialQueue.async {
             
-            self.clientLock.lock()
             let client = self.clientDict.removeValue(forKey: address.ip + ":\(address.port)")
             client?.cancel()
-            self.clientLock.unlock()
         }
     }
     
@@ -687,14 +686,12 @@ open class TCPServer: TCP {
      */
     open func removeAllClient() {
         
-        SocketQueue.concurrent.async {
+        serialQueue.async {
             
-            self.clientLock.lock()
             for (key, client) in self.clientDict {
                 self.clientDict.removeValue(forKey: key)
                 client.cancel()
             }
-            self.clientLock.unlock()
         }
     }
     
@@ -705,7 +702,7 @@ open class TCPServer: TCP {
      */
     open func listenClientConnect() {
         
-        SocketQueue.concurrent.async {
+        recvSerialQueue.async {
             
             if listen(self.id, Int32.max) == 0 {
                 
@@ -721,13 +718,11 @@ open class TCPServer: TCP {
                         let address = Address.init(addr: addr)
                         
                         /// 广播新的客户
-                        SocketQueue.concurrent.async {
-                            
-                            self.callbackLock.lock()
+                        self.serialQueue.async {
                             for (_, callback) in self.callback {
+                                // TODO: 并发？
                                 callback(address, [], Int(id))
                             }
-                            self.callbackLock.unlock()
                         }
                         
                         let client = TCPClient.init(id)
@@ -736,12 +731,11 @@ open class TCPServer: TCP {
                         client.addCallback(address.ip + ":\(address.port)", callback: { [weak self] (address, bytes, code) in
                             
                             /// 广播回调
-                            SocketQueue.concurrent.async {
-                                self?.callbackLock.lock()
+                            self?.serialQueue.async {
                                 for (_, callback) in self?.callback ?? [:] {
+                                    // TODO: 并发？
                                     callback(address, bytes, code)
                                 }
-                                self?.callbackLock.unlock()
                             }
                         })
                         
@@ -777,9 +771,7 @@ open class TCPServer: TCP {
      */
     open func sendClient(_ address: Address, bytes: [UInt8], repeatCount: Int = 0, statusCode: @escaping (Int)->Void) {
         
-        SocketQueue.concurrent.async {
-            
-            self.clientLock.lock()
+        sendSerialQueue.async {
             
             if let client = self.clientDict[address.ip + ":\(address.port)"] {
                 
@@ -789,8 +781,6 @@ open class TCPServer: TCP {
                 
                 statusCode(-99999)
             }
-            
-            self.clientLock.unlock()
         }
     }
 }

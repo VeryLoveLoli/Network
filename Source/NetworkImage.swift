@@ -11,7 +11,7 @@ import Foundation
 public extension Network {
     
     /// 图片网络
-    static let image = Network.init("NetworkImage", max: 3, directory: NSHomeDirectory() + "/Documents/Network/Image/")
+    static let image = Network.init("NetworkImage", max: Int.max, directory: NSHomeDirectory() + "/Documents/Network/Image/")
 }
 
 #if os(iOS) || os(watchOS) || os(tvOS)

@@ -22,7 +22,7 @@ public enum SocketConnectType {
 /**
  地址
  */
-public struct Address {
+public struct Address: Hashable {
     
     /// IP
     public let ip: String
@@ -569,14 +569,8 @@ open class TCPClient: TCP {
                     }
                     
                     let address = Address.init(peername: self.id)
-
-                    /// 广播回调
-                    self.serialQueue.async {
-                        for (_, callback) in self.callback {
-                            // TODO: 并发?
-                            callback(address, bytes, code)
-                        }
-                    }
+                    
+                    self.broadcastCallback(address, bytes: bytes, code: code)
                 }
                 
             } while code > 0
@@ -649,7 +643,24 @@ open class TCPClient: TCP {
 open class TCPServer: TCP {
     
     /// 客户字典
-    private(set) var clientDict: [String: TCPClient] = [:]
+    private var clientDict: [Address: TCPClient] = [:]
+    /// 客户字典（使用 serialQueue 队列 获取 避免多线程同时操作）
+    open var clients: [Address: TCPClient] {
+        
+        let dispatchSemaphore = DispatchSemaphore.init(value: 0)
+        
+        var dict: [Address: TCPClient] = [:]
+        
+        serialQueue.async {
+            
+            dict = self.clientDict
+            dispatchSemaphore.signal()
+        }
+        
+        dispatchSemaphore.wait()
+        
+        return dict
+    }
     
     // MARK: - Client
     
@@ -659,11 +670,11 @@ open class TCPServer: TCP {
      - parameter    address:    地址
      - parameter    client:     客户
      */
-    open func addClient(_ address: Address, client: TCPClient) {
+    fileprivate func addClient(_ address: Address, client: TCPClient) {
         
         serialQueue.async {
             
-            self.clientDict[address.ip + ":\(address.port)"] = client
+            self.clientDict[address] = client
         }
     }
     
@@ -676,7 +687,7 @@ open class TCPServer: TCP {
         
         serialQueue.async {
             
-            let client = self.clientDict.removeValue(forKey: address.ip + ":\(address.port)")
+            let client = self.clientDict.removeValue(forKey: address)
             client?.cancel()
         }
     }
@@ -688,8 +699,8 @@ open class TCPServer: TCP {
         
         serialQueue.async {
             
-            for (key, client) in self.clientDict {
-                self.clientDict.removeValue(forKey: key)
+            for (address, client) in self.clientDict {
+                self.clientDict.removeValue(forKey: address)
                 client.cancel()
             }
         }
@@ -717,31 +728,25 @@ open class TCPServer: TCP {
                         
                         let address = Address.init(addr: addr)
                         
-                        /// 广播新的客户
-                        self.serialQueue.async {
-                            for (_, callback) in self.callback {
-                                // TODO: 并发？
-                                callback(address, [], Int(id))
-                            }
-                        }
-                        
                         let client = TCPClient.init(id)
                         client.bytesProcess = self.bytesProcess
                         
                         client.addCallback(address.ip + ":\(address.port)", callback: { [weak self] (address, bytes, code) in
                             
-                            /// 广播回调
-                            self?.serialQueue.async {
-                                for (_, callback) in self?.callback ?? [:] {
-                                    // TODO: 并发？
-                                    callback(address, bytes, code)
-                                }
+                            if bytes.count == 0 && code == 0 {
+                                
+                                self?.removeClient(address)
                             }
+                            
+                            self?.broadcastCallback(address, bytes: bytes, code: code)
                         })
                         
                         client.waitBytes()
                         
                         self.addClient(address, client: client)
+                        
+                        /// 广播新的客户
+                        self.broadcastCallback(address, bytes: [], code: Int(id))
                     }
                 }
             }
@@ -749,37 +754,34 @@ open class TCPServer: TCP {
     }
     
     /**
-     发送客户数据
+     发送数据（所有客户）
      
-     - parameter    address:        地址
      - parameter    data:           发送的数据
      - parameter    repeatCount:    失败重发次数
-     - parameter    statusCode:     状态码 send()函数的返回值; -99999: 客户未连接
+     - parameter    clientStatus:   Address 客户地址; Int 状态码 send()函数的返回值
      */
-    open func sendClient(_ address: Address, data: Data, repeatCount: Int = 0, statusCode: @escaping (Int)->Void) {
+    open func send(_ data: Data, repeatCount: Int = 0, clientStatus: @escaping (Address, Int)->Void) {
         
-        sendClient(address, bytes: [UInt8].init(data), repeatCount: repeatCount, statusCode: statusCode)
+        send([UInt8].init(data), repeatCount: repeatCount, clientStatus: clientStatus)
     }
     
     /**
-     发送客户字节
+     发送字节（所有客户）
      
-     - parameter    address:        地址
      - parameter    bytes:          发送的字节
      - parameter    repeatCount:    失败重发次数
-     - parameter    statusCode:     状态码 send()函数的返回值; -99999: 客户未连接
+     - parameter    clientStatus:   Address 客户地址; Int 状态码 send()函数的返回值
      */
-    open func sendClient(_ address: Address, bytes: [UInt8], repeatCount: Int = 0, statusCode: @escaping (Int)->Void) {
+    open func send(_ bytes: [UInt8], repeatCount: Int = 0, clientStatus: @escaping (Address, Int)->Void) {
         
-        sendSerialQueue.async {
+        serialQueue.async {
             
-            if let client = self.clientDict[address.ip + ":\(address.port)"] {
+            for (address, client) in self.clientDict {
                 
-                client.sendBytes(bytes, repeatCount: repeatCount, statusCode: statusCode)
-            }
-            else {
-                
-                statusCode(-99999)
+                client.sendBytes(bytes, repeatCount: repeatCount) { (code) in
+                    
+                    clientStatus(address, code)
+                }
             }
         }
     }

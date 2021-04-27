@@ -1,4 +1,5 @@
 # Network
+
 一个简易的`Swift`语言`Network`
 
 包含`HTTP``Socket``Image`
@@ -17,6 +18,15 @@
 ##### `Socket`
 * 多方同一个请求，只请求一次，多方返回。
 * `TCP`返回数据预处理
+
+## Integration
+
+### Xcode
+    File -> Swift Packages -> Add Package dependency
+
+### CocoaPods
+
+[GitHub Network](https://github.com/VeryLoveLoli/Network)
 
 ## 使用
 

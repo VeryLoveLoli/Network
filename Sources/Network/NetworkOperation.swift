@@ -85,7 +85,7 @@ open class NetworkOperation: Operation, URLSessionDelegate, URLSessionTaskDelega
         
         if let url = request.url, let data = url.absoluteString.data(using: .utf8) {
             
-            return data.base64EncodedString()
+            return data.base64EncodedString().replacingOccurrences(of: "/", with: "-")
         }
         
         return nil

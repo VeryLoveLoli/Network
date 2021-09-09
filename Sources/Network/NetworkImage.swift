@@ -217,14 +217,21 @@ public extension UIImageView {
         
         DispatchQueue.main.async {
             
-            if images.count > 0 {
+            if images.count > 1 {
+                
+                self.image = images[0]
+                
+                self.animationImages = images
+                self.animationDuration = duration
+                if self.isAnimating {
+                    self.stopAnimating()
+                }
+                self.startAnimating()
+            }
+            else if images.count == 1 {
                 
                 self.image = images[0]
             }
-            
-            self.animationImages = images
-            self.animationDuration = duration
-            self.startAnimating()
         }
         
         return images.count

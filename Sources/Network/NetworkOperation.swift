@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import CommonCrypto
 
 /**
  网络操作
@@ -83,9 +84,20 @@ open class NetworkOperation: Operation, URLSessionDelegate, URLSessionTaskDelega
      */
     public static func key(_ request: URLRequest) -> String? {
         
-        if let url = request.url, let data = url.absoluteString.data(using: .utf8) {
+        if let url = request.url {
             
-            return data.base64EncodedString().replacingOccurrences(of: "/", with: "-")
+            var content = url.absoluteString
+            
+            if let body = request.httpBody, let bodyString = String(data: body, encoding: .utf8) {
+                
+                content += bodyString
+            }
+            
+            let utf8 = content.cString(using: .utf8)
+            
+            var digest = [UInt8](repeating: 0, count: Int(CC_SHA256_DIGEST_LENGTH))
+            CC_SHA256(utf8, CC_LONG(utf8!.count - 1), &digest)
+            return digest.reduce("") { $0 + String(format:"%02x", $1)}
         }
         
         return nil

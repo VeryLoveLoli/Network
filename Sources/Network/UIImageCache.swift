@@ -23,10 +23,10 @@ open class UIImageCache: NSCache<NSString, UIImage> {
         super.init()
         
         /// 注册内存警告
-        NotificationCenter.default.addObserver(forName: UIApplication.didReceiveMemoryWarningNotification, object: nil, queue: OperationQueue.main) { (notification) in
+        NotificationCenter.default.addObserver(forName: UIApplication.didReceiveMemoryWarningNotification, object: nil, queue: OperationQueue.main) { [weak self] (notification) in
             
             /// 删除缓存
-            self.removeAllObjects()
+            self?.removeAllObjects()
         }
     }
 }

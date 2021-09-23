@@ -32,10 +32,10 @@ open class DataCache {
         
         #if os(iOS) || os(watchOS) || os(tvOS)
         /// 注册内存警告
-        NotificationCenter.default.addObserver(forName: UIApplication.didReceiveMemoryWarningNotification, object: nil, queue: nil) { (notification) in
+        NotificationCenter.default.addObserver(forName: UIApplication.didReceiveMemoryWarningNotification, object: nil, queue: nil) { [weak self] (notification) in
             
             /// 删除缓存
-            self.removeAll()
+            self?.removeAll()
         }
         #endif
     }
@@ -79,7 +79,7 @@ open class DataCache {
         
         serialQueue.async {
             
-            self.removeAll()
+            self.dictionary.removeAll()
         }
     }
 }

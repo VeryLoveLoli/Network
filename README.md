@@ -6,14 +6,15 @@
 
 ### 支持
 
-##### `HTTP` `Image`
-* `Cache`缓存
-* `Disk`磁盘存储
-* 队列顺序请求，可设置并发数量，完成一个自动请求下一个
-* 可将请求立即请求，正在请求队列数量超过并发数量，会将最早的请求转移到等待队列前端
-* 或者加入等待队列末尾(用于预加载再好不过了，特别是预加载图片列表)，如果正在请求队列数量低于并发数量，会自动将等待队列前端请求转移到正在请求队列
+##### `HTTP` 
 * 多方同一个请求，只请求一次，多方返回。
-* `Image`扩展`UIImageView`、`UIButton`、`NSImageView`、`NSButton`、`GIF`
+* `Disk`磁盘存储
+
+##### `Image`
+* 基于`HTTP`
+* 图片缓存
+* 支持GIF、TIFF动图加载
+* 扩展`UIImageView`、`UIButton`、`UIBarItem`、`UITabBarItem`图片加载
 
 ##### `Socket`
 * 多方同一个请求，只请求一次，多方返回。
@@ -30,71 +31,70 @@
 
 ## 使用
 
-### `Network``HTTP`
+### `HTTP`
 
 如果闭包包含`self`,加上`[weak self]`
 
 ```swift
-Network.default.load("http://i0.hdslb.com/bfs/archive/24e031e495699e234526586deb80c65d337cbe4d.png") { [weak self] (error, data, path) in
-    
-    self.data = data
-    print(error)
-    print(data?.count)
-    print(path)
-}
+        
+        let request = URLRequest(url: URL(string: "http://i0.hdslb.com/bfs/archive/24e031e495699e234526586deb80c65d337cbe4d.png")!)
+        
+        /// 数据
+        Network.default.data(request) { data in
+            
+        } error: { error in
+            
+        }?.resume()
+        
+        /// 下载
+        Network.default.download(request) { path in
+            
+        } progress: { current, total in
+            
+        } error: { error in
+            
+        }?.resume()
+        
+        /// 自定义请求、回调（一般使用数据和下载即可）
+        Network.default.load(request, key: Network.key(request)!, callbackKey: "\(arc4random())") { data in
+            
+        } path: { path in
+            
+        } progress: { current, total in
+            
+        } error: { error in
+            
+        }?.resume()
 ```
 
 项目中使用最好先扩展 `Network`，实现项目特有的`URLRequest`请求、`Data`数据解析
-
-例如:
-
-```swift
-extension Network {
-    
-    /// xx请求
-    static func xxRequest() -> URLRequest {
-        
-        /// 加密
-        /// 设置HTTPHead
-        /// 请求方式 GET/POST
-    }
-    
-    /// xx解析
-    static func xxAnalysis(_ data: Data?) -> Any {
-        
-        /// 解密
-        /// 返回 XML/JSON/other
-    }
-    
-    /// xxAPI
-    static func xxAPI(progress: @escaping NetworkCallbackProgress = { _,_ in },
-                      result: @escaping (Any)->Void) -> Any {
-        
-        Network.default.load(Network.xxRequest(), isCache: false, isDisk: false, isStart: true, callbackID: "\(Date.init().timeIntervalSince1970)\(arc4random())", progress: progress) { (error, data, path) in
-            
-            result(Network.xxAnalysis(data))
-        }
-    }
-}
-```
 
 ### `Image`
 
 如果闭包包含`self`,加上`[weak self]`
 
-设置UIImageView，其它也一样的
+`UIImageView`图片加载
 
 ```swift
-self.imageView.load("https://i0.hdslb.com/bfs/archive/5e889fec08dab8cd8f7c6cc0478265ecb9839493.gif", defaultImage: nil, isCache: true, isDisk: true) { (current, total) in
-    
-    print("image - \(current)/\(total) - \(String.init(format: "%.2f", Float(current)/Float(total)*100))%")
-}
+        let imageView = UIImageView()
+        imageView.load("http://i0.hdslb.com/bfs/archive/24e031e495699e234526586deb80c65d337cbe4d.png")
 ```
 
-图片预加载 (必须磁盘存储，`UIImageView`、`NSImageView`等使用的缓存和`Network`不一样)
+`UIImageView`图片加载进度
 
 ```swift
-Network.image.load("http://i0.hdslb.com/bfs/archive/24e031e495699e234526586deb80c65d337cbe4d.png", isCache: false, isDisk: true, isStart: false) { (_, _, _) in }
+        let imageView = UIImageView()
+        imageView.load("http://i0.hdslb.com/bfs/archive/24e031e495699e234526586deb80c65d337cbe4d.png", progress:{ current, total in
+            print("\(current)/\(total)")
+        })
+      
+```
+
+图片预加载
+
+```swift
+        let request = URLRequest(url: URL(string: "http://i0.hdslb.com/bfs/archive/24e031e495699e234526586deb80c65d337cbe4d.png")!)
+        Image.load(request)
 ```
 
 ### `Socket`
@@ -147,6 +147,12 @@ udp?.removeAllCallback()
 /// 关闭Socket
 udp?.cancel()
 ```
+
+##### `TCP`
+
+`TCP`支持数据预处理，收集足够数据，解析完成后再回调。
+
+继承 `TCPSocketBytesProcess` 实现读取处理方法，将处理对象设置到`TCP.bytesProcess`上。
 
 ##### `TCPClient`
 

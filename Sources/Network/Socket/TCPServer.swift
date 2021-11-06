@@ -13,23 +13,11 @@ import Foundation
 open class TCPServer: TCP {
     
     /// 客户字典
-    private var clientDict: [Address: TCPClient] = [:]
-    /// 客户字典（使用 serialQueue 队列 获取 避免多线程同时操作）
+    private var clientDict = Socket.Dictionary<Address, TCPClient>()
+    /// 客户字典
     open var clients: [Address: TCPClient] {
         
-        let dispatchSemaphore = DispatchSemaphore.init(value: 0)
-        
-        var dict: [Address: TCPClient] = [:]
-        
-        serialQueue.async {
-            
-            dict = self.clientDict
-            dispatchSemaphore.signal()
-        }
-        
-        dispatchSemaphore.wait()
-        
-        return dict
+        return clientDict.dict()
     }
     
     // MARK: - Client
@@ -42,10 +30,7 @@ open class TCPServer: TCP {
      */
     fileprivate func addClient(_ address: Address, client: TCPClient) {
         
-        serialQueue.async {
-            
-            self.clientDict[address] = client
-        }
+        clientDict.add(address, value: client)
     }
     
     /**
@@ -55,11 +40,7 @@ open class TCPServer: TCP {
      */
     open func removeClient(_ address: Address) {
         
-        serialQueue.async {
-            
-            let client = self.clientDict.removeValue(forKey: address)
-            client?.cancel()
-        }
+        clientDict.remove(address)?.cancel()
     }
     
     /**
@@ -67,13 +48,12 @@ open class TCPServer: TCP {
      */
     open func removeAllClient() {
         
-        serialQueue.async {
+        for (_, client) in clients {
             
-            for (address, client) in self.clientDict {
-                self.clientDict.removeValue(forKey: address)
-                client.cancel()
-            }
+            client.cancel()
         }
+        
+        clientDict.removeAll()
     }
     
     // MARK: - socket
@@ -144,14 +124,11 @@ open class TCPServer: TCP {
      */
     open func send(_ bytes: [UInt8], repeatCount: Int = 0, clientStatus: @escaping (Address, Int)->Void) {
         
-        serialQueue.async {
+        for (address, client) in clients {
             
-            for (address, client) in self.clientDict {
+            client.sendBytes(bytes, repeatCount: repeatCount) { (code) in
                 
-                client.sendBytes(bytes, repeatCount: repeatCount) { (code) in
-                    
-                    clientStatus(address, code)
-                }
+                clientStatus(address, code)
             }
         }
     }

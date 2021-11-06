@@ -22,6 +22,8 @@ public protocol TCPSocketBytesProcess {
      
      - parameter    bytes:      字节
      - parameter    code:       读取状态
+     
+     - returns  是否处理完成。处理完成将结果设置到`bytes`提供外部读取
      */
     func recv(_ bytes: [UInt8], code: Int) -> Bool
 }

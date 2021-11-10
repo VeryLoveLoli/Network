@@ -37,6 +37,21 @@
 
 ```swift
         
+        /// 证书设置（如不需要认证可不设置）
+        /*
+        Network.default.sessionDelegate.authChallenge = { challenge in
+            /// 证书处理代码。。。
+            
+            return (.performDefaultHandling, nil)
+        }
+        
+        Network.default.sessionDelegate.taskAuthChallenge = { task, challenge in
+            /// 证书处理代码。。。
+            
+            return (.performDefaultHandling, nil)
+        }
+        */
+        
         let request = URLRequest(url: URL(string: "http://i0.hdslb.com/bfs/archive/24e031e495699e234526586deb80c65d337cbe4d.png")!)
         
         /// 数据

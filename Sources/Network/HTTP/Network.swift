@@ -695,6 +695,11 @@ public extension Network {
         /// 磁盘缓存
         let diskCache: Network.DiskCache
         
+        /// 认证
+        open var authChallenge: ((URLAuthenticationChallenge) -> (URLSession.AuthChallengeDisposition, URLCredential?))? = nil
+        /// 任务认证
+        open var taskAuthChallenge: ((URLSessionTask, URLAuthenticationChallenge) -> (URLSession.AuthChallengeDisposition, URLCredential?))? = nil
+        
         // MARK: - init
         
         /**
@@ -735,7 +740,14 @@ public extension Network {
          */
         public func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
             
-            completionHandler(.performDefaultHandling, challenge.proposedCredential)
+            if let (a, c) = authChallenge?(challenge) {
+                
+                completionHandler(a, c)
+            }
+            else {
+                
+                completionHandler(.performDefaultHandling, challenge.proposedCredential)
+            }
         }
         
         // MARK: - URLSessionTaskDelegate
@@ -745,7 +757,14 @@ public extension Network {
          */
         public func urlSession(_ session: URLSession, task: URLSessionTask, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
             
-            completionHandler(.performDefaultHandling, challenge.proposedCredential)
+            if let (a, c) = taskAuthChallenge?(task, challenge) {
+                
+                completionHandler(a, c)
+            }
+            else {
+                
+                completionHandler(.performDefaultHandling, challenge.proposedCredential)
+            }
         }
         
         /**

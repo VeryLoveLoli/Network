@@ -40,7 +40,7 @@ open class Network {
      */
     public init(configuration: URLSessionConfiguration, queue: OperationQueue? = nil, path: String) {
         
-        self.path = path + "\(Self.self)"
+        self.path = path
         sessionDelegate = Network.SessionDelegate(path: path)
         session = URLSession(configuration: configuration, delegate: sessionDelegate, delegateQueue: queue)
         

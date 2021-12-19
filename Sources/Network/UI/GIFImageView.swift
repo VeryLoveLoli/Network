@@ -260,9 +260,59 @@ open class GIFImageView: UIImageView, CADisplayLinkProtocol {
 /**
  GIF图片视图加载协议
  */
-extension GIFImageView {
+public extension GIFImageView {
     
     // MARK: - ImageLoadProtocol
+    
+    /**
+     加载网络图片
+     
+     - parameter    urlString:      地址字符串
+     - parameter    defaultImage:   默认图
+     - parameter    enumType:       类型区分
+     - parameter    success:        成功：图片
+     - parameter    progress:       加载进度
+     - parameter    error:          失败：错误
+     */
+    func load(_ urlString: String,
+              defaultImage: Image? = nil,
+              enumType: EnumType? = nil,
+              success: ((Image)->Void)? = nil,
+              progress: ((Int64, Int64)->Void)? = nil,
+              error: ((Error)->Void)? = nil) {
+        
+        if let url = URL(string: urlString) {
+            
+            load(url, defaultImage: defaultImage, enumType: enumType, success: success, progress: progress, error: error)
+        }
+        else {
+            
+            cancelCallback(enumType)
+            mainThreadImage(defaultImage, enumType: enumType)
+            
+            error?(Network.MessageError("\(urlString) Not URL"))
+        }
+    }
+    
+    /**
+     加载网络图片
+     
+     - parameter    url:            地址
+     - parameter    defaultImage:   默认图
+     - parameter    enumType:       类型区分
+     - parameter    success:        成功：图片
+     - parameter    progress:       加载进度
+     - parameter    error:          失败：错误
+     */
+    func load(_ url: URL,
+              defaultImage: Image? = nil,
+              enumType: EnumType? = nil,
+              success: ((Image)->Void)? = nil,
+              progress: ((Int64, Int64)->Void)? = nil,
+              error: ((Error)->Void)? = nil) {
+        
+        load(URLRequest(url: url), defaultImage: defaultImage, enumType: enumType, success: success, progress: progress, error: error)
+    }
     
     /**
      加载网络图片
@@ -274,12 +324,12 @@ extension GIFImageView {
      - parameter    progress:       加载进度
      - parameter    error:          失败：错误
      */
-    public func load(_ request: URLRequest,
-                     defaultImage: Image? = nil,
-                     enumType: EnumType? = nil,
-                     success: ((Image)->Void)? = nil,
-                     progress: ((Int64, Int64)->Void)? = nil,
-                     error: ((Error)->Void)? = nil) {
+    func load(_ request: URLRequest,
+              defaultImage: Image? = nil,
+              enumType: EnumType? = nil,
+              success: ((Image)->Void)? = nil,
+              progress: ((Int64, Int64)->Void)? = nil,
+              error: ((Error)->Void)? = nil) {
         
         cancelCallback(enumType)
         
@@ -307,12 +357,33 @@ extension GIFImageView {
     }
     
     /**
+     主线程更新图片
+     
+     - parameter    mainImage:      图片
+     - parameter    enumType:       类型区分
+     */
+    func mainThreadImage(_ mainImage: Image? = nil, enumType: EnumType? = nil) {
+        
+        if Thread.isMainThread {
+            
+            updateImage(mainImage, enumType: enumType)
+        }
+        else {
+            
+            DispatchQueue.main.async {
+                
+                self.updateImage(mainImage, enumType: enumType)
+            }
+        }
+    }
+    
+    /**
      更新图片
      
      - parameter    mainImage:      图片
      - parameter    enumType:       类型区分
      */
-    public func updateImage(_ mainImage: Image? = nil, enumType: EnumType? = nil) {
+    func updateImage(_ mainImage: Image? = nil, enumType: EnumType? = nil) {
         
         if isAnimating {
             

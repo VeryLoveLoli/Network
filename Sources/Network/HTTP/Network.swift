@@ -334,7 +334,7 @@ public extension Network {
          
          - parameter    string:     信息
          */
-        init(_ string: String) {
+        public init(_ string: String) {
             
             message = string
         }

@@ -15,23 +15,41 @@ open class Image {
     
     // MARK: - Parameter
     
+    /// 默认GIF缓存大小（10MB）
+    public static var gifSize = 1024*1024*10
+    
     /// 格式
-    public var format: Image.Format
+    public var format: Image.Format = Image.Format.unknown
     /// 列表
-    public var items: [UIImage]
+    public var items: [UIImage] = []
     /// 时间
-    public var duration: TimeInterval
+    public var duration: TimeInterval = 0
     /// 数据
     public var data: Data?
     /// 图片
     public var item: UIImage? { return items.first }
     
+    /// GIF 图片源
+    public var gifImageSource: CGImageSource?
+    /// GIF 列表
+    public var gifItems: [GIFItem]?
+    
     // MARK: - init
     
     /**
      初始化
+     
+     - parameter    data:           图片数据
+     - parameter    gifCacheSize:   GIF缓存大小
+     `nil`则存储`GIF`图片数组`items`和总时长`duration`。设置大小则存储`CGImageSource`，按照大小存储图片组`gifItems`
+     存储规则：
+     size<=0：全部存储
+     占用内存大小<size：全部存储
+     占用内存大小<2*size：并且图片数量>=2：隔张存储
+     占用内存大小<n*size：并且图片数量>=n：隔n-1张存储
+     其余情况不存储
      */
-    public init?(_ data: Data) {
+    public init?(_ data: Data, gifCacheSize: Int? = nil) {
         
         format = Image.format(data)
         
@@ -39,16 +57,34 @@ open class Image {
             
         case .gif, .tiff:
             
-            if let animation = Image.animation(data) {
+            if let cacheSize = gifCacheSize {
                 
-                items = animation.0
-                duration = animation.1
+                if let animationGIF = Image.animationGIF(data, cacheSize: cacheSize) {
+                    
+                    items = []
+                    duration = 0
+                    
+                    gifImageSource = animationGIF.0
+                    gifItems = animationGIF.1
+                }
+                else {
+                    
+                    return nil
+                }
             }
             else {
                 
-                return nil
+                if let animation = Image.animation(data) {
+                    
+                    items = animation.0
+                    duration = animation.1
+                }
+                else {
+                    
+                    return nil
+                }
             }
-            
+                        
         default:
             
             if let image = UIImage(data: data) {
@@ -197,6 +233,37 @@ public extension Image {
 }
 
 /**
+ 图片GIF项
+ */
+public extension Image {
+    
+    // MARK: - GIFItem
+    
+    /**
+     GIF项
+     */
+    class GIFItem {
+        
+        /// 时间
+        public var duration: TimeInterval
+        /// 索引
+        public var index: Int
+        /// 图片
+        public var image: CGImage?
+        
+        /**
+         初始化
+         */
+        init(duration: TimeInterval, index: Int, image: CGImage? = nil) {
+            
+            self.duration = duration
+            self.index = index
+            self.image = image
+        }
+    }
+}
+
+/**
  图片动画
  */
 public extension Image {
@@ -259,6 +326,113 @@ public extension Image {
         
         return (images, duration)
     }
+    
+    /**
+     动画图片GIF
+     
+     - parameter    data:           图片数据
+     - parameter    cacheSize:      缓存大小
+     存储规则：
+     size<=0：全部存储
+     占用内存大小<size：全部存储
+     占用内存大小<2*size：并且图片数量>=2：隔张存储
+     占用内存大小<n*size：并且图片数量>=n：隔n-1张存储
+     其余情况不存储
+     
+     - returns  动画GIF图片源，动画GIF列表
+     */
+    static func animationGIF(_ data: Data, cacheSize: Int) -> (CGImageSource, [Image.GIFItem])? {
+        
+        /// 获取图片资源
+        guard let source = CGImageSourceCreateWithData(data as CFData, nil) else { return nil }
+        
+        /// 获取图片数量
+        let count = CGImageSourceGetCount(source)
+        
+        var items: [Image.GIFItem] = []
+        var duration: TimeInterval = 0
+        
+        /// 总大小
+        var totalSize = 0
+        /// 存储比率
+        var ratio = 0
+        
+        for i in 0..<count {
+            
+            /// 获取图片
+            guard let cgimage = CGImageSourceCreateImageAtIndex(source, i, nil) else {
+                
+                continue
+            }
+            
+            if totalSize == 0 {
+                
+                /// 计算总大小
+                totalSize = cgimage.height * cgimage.width * i * 4
+                
+                if totalSize < cacheSize || cacheSize <= 0 {
+                    
+                    /// 存储全部
+                    ratio = 1
+                }
+                else {
+                    
+                    let multiple = totalSize/cacheSize + 1
+                    
+                    if count >= multiple {
+                        
+                        /// 隔`multiple-1`张存储
+                        ratio = multiple
+                    }
+                    else {
+                        
+                        /// 不存储
+                        ratio = 0
+                    }
+                }
+            }
+            
+            /// 是否缓存
+            var isCache = false
+            
+            if ratio > 0 {
+                
+                if i%ratio == 0 {
+                    
+                    isCache = true
+                }
+            }
+            
+            /// 获取时间
+            guard let properties = CGImageSourceCopyPropertiesAtIndex(source, i, nil) else {
+                
+                continue
+            }
+            
+            guard let gifDict = (properties as Dictionary)[kCGImagePropertyGIFDictionary] else {
+                
+                continue
+            }
+            
+            guard let time = (gifDict as? Dictionary<CFString, Any>)?[kCGImagePropertyGIFDelayTime] else {
+                
+                continue
+            }
+            
+            duration += (time as? TimeInterval) ?? 0
+            
+            let item = GIFItem(duration: duration, index: i, image: isCache ? cgimage : nil)
+            
+            items.append(item)
+        }
+        
+        if items.count == 0 {
+            
+            return nil
+        }
+        
+        return (source, items)
+    }
 }
 
 /**
@@ -274,6 +448,7 @@ public extension Image {
      - parameter    request:            请求
      - parameter    callbackKey:        回调标识
      - parameter    cacheOptions:       缓存选项
+     - parameter    gifCacheSize:       GIF缓存大小
      - parameter    success:            成功：图片或GIF图
      - parameter    progress:           加载进度
      - parameter    error:              失败：错误
@@ -281,6 +456,7 @@ public extension Image {
     static func load(_ request: URLRequest,
                      callbackKey: String = "\(Date.init().timeIntervalSince1970)-\(arc4random())",
                      cacheOptions: Set<Image.CacheOption> = [.ram, .disk],
+                     gifCacheSize: Int? = nil,
                      success: ((Image)->Void)? = nil,
                      progress: ((Int64, Int64)->Void)? = nil,
                      error: ((Error)->Void)? = nil) {
@@ -298,7 +474,7 @@ public extension Image {
             
             Image.network.load(request, key: key, callbackKey: callbackKey, cachePolicy: cacheOptions.contains(.disk) ? .cache : .reload, data: { data in
                 
-                if let image = Image(data) {
+                if let image = Image(data, gifCacheSize: gifCacheSize) {
                     
                     if cacheOptions.contains(.ram) {
                         

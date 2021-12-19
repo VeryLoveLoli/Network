@@ -15,6 +15,7 @@
 * 图片缓存
 * 支持GIF、TIFF动图加载
 * 扩展`UIImageView`、`UIButton`、`UIBarItem`、`UITabBarItem`图片加载
+* `GIFImageView`占用少量内存播放`GIF`
 
 ##### `Socket`
 * 多方同一个请求，只请求一次，多方返回。

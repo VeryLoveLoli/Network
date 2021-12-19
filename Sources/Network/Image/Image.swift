@@ -368,7 +368,7 @@ public extension Image {
             if totalSize == 0 {
                 
                 /// 计算总大小
-                totalSize = cgimage.height * cgimage.width * i * 4
+                totalSize = cgimage.height * cgimage.width * count * 4
                 
                 if totalSize < cacheSize || cacheSize <= 0 {
                     

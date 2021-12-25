@@ -842,7 +842,7 @@ public extension Network {
                 diskCache.clean(key: key)
             }
             
-            progressCallback.callback(key: key, any: (dataTask.countOfBytesReceived, dataTask.countOfBytesExpectedToReceive))
+            progressCallback.callback(key: key, any: (dataTask.countOfBytesReceived, dataTask.countOfBytesExpectedToReceive), isRemove: false)
             
             completionHandler(.allow)
         }
@@ -864,7 +864,7 @@ public extension Network {
                 diskCache.write(key: key, data: data)
             }
             
-            progressCallback.callback(key: key, any: (dataTask.countOfBytesReceived, dataTask.countOfBytesExpectedToReceive))
+            progressCallback.callback(key: key, any: (dataTask.countOfBytesReceived, dataTask.countOfBytesExpectedToReceive), isRemove: false)
         }
         
         /**

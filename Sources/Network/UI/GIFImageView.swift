@@ -428,6 +428,13 @@ open class CADisplayLinkTarget {
     open weak var delegate: CADisplayLinkProtocol?
     
     /**
+     初始化
+     */
+    public init() {
+        
+    }
+    
+    /**
      屏幕刷新处理
      
      - parameter    link:       屏幕刷新

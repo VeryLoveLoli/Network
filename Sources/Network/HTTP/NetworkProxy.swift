@@ -11,14 +11,14 @@ import CFNetwork
 /**
  网络代理
  */
-class NetworkProxy {
+open class NetworkProxy {
     
     /**
      代理信息
      
      - parameter    url:    检测地址
      */
-    static func info(_ url: URL) -> Dictionary<CFString, Any>? {
+    public static func info(_ url: URL) -> Dictionary<CFString, Any>? {
         
         /**
          对象 -> 指针
@@ -58,7 +58,7 @@ class NetworkProxy {
      
      - parameter    url:    检测地址
      */
-    static func isUse(_ url: URL = URL(string: "https://www.baidu.com")!) -> Bool {
+    public static func isUse(_ url: URL = URL(string: "https://www.baidu.com")!) -> Bool {
         
         if let settings = info(url) {
             

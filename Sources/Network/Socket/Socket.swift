@@ -279,7 +279,7 @@ public extension Socket {
          - parameter    any:            回调结果
          - parameter    isRemove:       是否删除回调
          */
-        func callback(key: String , any: T, isRemove: Bool = true) {
+        func callback(key: String , any: T, isRemove: Bool = false) {
             
             semaphore.wait()
             
@@ -306,7 +306,7 @@ public extension Socket {
          - parameter    any:            回调结果
          - parameter    isRemove:       是否删除回调
          */
-        func callbackAll(any: T, isRemove: Bool = true) {
+        func callbackAll(any: T, isRemove: Bool = false) {
             
             semaphore.wait()
             

@@ -116,10 +116,12 @@ open class Socket {
     
     /**
      绑定
+     
+     - parameter    ip:     IP（使用`127.0.0.1`仅能在本机内连接）
      */
-    open func bindAddress() -> Int32 {
+    open func bindAddress(_ ip: String = "0.0.0.0") -> Int32 {
         
-        var addr = Address.init("127.0.0.1", port: port).sockaddrStruct()
+        var addr = Address.init(ip, port: port).sockaddrStruct()
         
         /// 绑定
         let status = bind(id, &(addr), UInt32(MemoryLayout.stride(ofValue: addr)))

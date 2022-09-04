@@ -209,6 +209,8 @@ public extension Socket {
         
         /// 回调字典
         var dictionary: [String: (T)->Void] = [:]
+        /// 队列字典
+        var queueKV: [String: DispatchQueue] = [:]
         
         /// 信号
         var semaphore = DispatchSemaphore(value: 1)
@@ -226,6 +228,7 @@ public extension Socket {
             semaphore.wait()
             
             dictionary[key] = callback
+            queueKV[key] = DispatchQueue(label: key)
             
             semaphore.signal()
         }
@@ -240,6 +243,7 @@ public extension Socket {
             semaphore.wait()
             
             dictionary.removeValue(forKey: key)
+            queueKV.removeValue(forKey: key)
             
             semaphore.signal()
         }
@@ -252,6 +256,7 @@ public extension Socket {
             semaphore.wait()
             
             dictionary.removeAll()
+            queueKV.removeAll()
             
             semaphore.signal()
         }
@@ -285,10 +290,9 @@ public extension Socket {
             
             semaphore.wait()
             
-            if let callback = dictionary[key] {
+            if let callback = dictionary[key], let queue = queueKV[key] {
                 
-                /// 防止卡住异步处理
-                DispatchQueue.global().async {
+                queue.async {
                     
                     callback(any)
                 }
@@ -312,12 +316,14 @@ public extension Socket {
             
             semaphore.wait()
             
-            for (_, v) in dictionary {
+            for (k, v) in dictionary {
                 
-                /// 防止卡住异步处理
-                DispatchQueue.global().async {
+                if let queue = queueKV[k] {
                     
-                    v(any)
+                    queue.async {
+                        
+                        v(any)
+                    }
                 }
             }
             

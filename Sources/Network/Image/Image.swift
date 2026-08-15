@@ -551,6 +551,13 @@ public extension Image {
         }
         else {
             
+            var path: ((String)->Void)? = nil
+            
+            if cacheOptions.contains(.disk) {
+                
+                path = { path in }
+            }
+            
             Image.network.load(request, key: key, callbackKey: callbackKey, cachePolicy: cacheOptions.contains(.disk) ? .cache : .reload, data: { data in
                 
                 if let image = Image(data, gifCacheSize: gifCacheSize) {
@@ -567,9 +574,7 @@ public extension Image {
                     error?(Network.MessageError("Data Not Image"))
                 }
                 
-            }, path: { path in
-                
-            }, progress: progress, error: error)
+            }, path: path, progress: progress, error: error)
         }
     }
 }

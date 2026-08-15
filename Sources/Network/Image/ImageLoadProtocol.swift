@@ -51,6 +51,7 @@ public protocol ImageLoadProtocol: AnyObject {
      - parameter    urlString:      地址字符串
      - parameter    defaultImage:   默认图
      - parameter    enumType:       类型区分
+     - parameter    cacheOptions:   缓存选项
      - parameter    success:        成功：图片
      - parameter    progress:       加载进度
      - parameter    error:          失败：错误
@@ -58,6 +59,7 @@ public protocol ImageLoadProtocol: AnyObject {
     func load(_ urlString: String,
               defaultImage: Image?,
               enumType: EnumType?,
+              cacheOptions: Set<Image.CacheOption>,
               success: ((Image)->Void)?,
               progress: ((Int64, Int64)->Void)?,
               error: ((Error)->Void)?)
@@ -68,6 +70,7 @@ public protocol ImageLoadProtocol: AnyObject {
      - parameter    url:            地址
      - parameter    defaultImage:   默认图
      - parameter    enumType:       类型区分
+     - parameter    cacheOptions:   缓存选项
      - parameter    success:        成功：图片
      - parameter    progress:       加载进度
      - parameter    error:          失败：错误
@@ -75,6 +78,7 @@ public protocol ImageLoadProtocol: AnyObject {
     func load(_ url: URL,
               defaultImage: Image?,
               enumType: EnumType?,
+              cacheOptions: Set<Image.CacheOption>,
               success: ((Image)->Void)?,
               progress: ((Int64, Int64)->Void)?,
               error: ((Error)->Void)?)
@@ -85,6 +89,7 @@ public protocol ImageLoadProtocol: AnyObject {
      - parameter    request:        请求
      - parameter    defaultImage:   默认图
      - parameter    enumType:       类型区分
+     - parameter    cacheOptions:   缓存选项
      - parameter    success:        成功：图片或GIF图
      - parameter    progress:       加载进度
      - parameter    error:          失败：错误
@@ -92,6 +97,7 @@ public protocol ImageLoadProtocol: AnyObject {
     func load(_ request: URLRequest,
               defaultImage: Image?,
               enumType: EnumType?,
+              cacheOptions: Set<Image.CacheOption>,
               success: ((Image)->Void)?,
               progress: ((Int64, Int64)->Void)?,
               error: ((Error)->Void)?)
@@ -144,6 +150,7 @@ public extension ImageLoadProtocol {
      - parameter    urlString:      地址字符串
      - parameter    defaultImage:   默认图
      - parameter    enumType:       类型区分
+     - parameter    cacheOptions:   缓存选项
      - parameter    success:        成功：图片
      - parameter    progress:       加载进度
      - parameter    error:          失败：错误
@@ -151,6 +158,7 @@ public extension ImageLoadProtocol {
     func load(_ urlString: String,
               defaultImage: Image? = nil,
               enumType: EnumType? = nil,
+              cacheOptions: Set<Image.CacheOption> = [.ram, .disk],
               success: ((Image)->Void)? = nil,
               progress: ((Int64, Int64)->Void)? = nil,
               error: ((Error)->Void)? = nil) {
@@ -174,6 +182,7 @@ public extension ImageLoadProtocol {
      - parameter    url:            地址
      - parameter    defaultImage:   默认图
      - parameter    enumType:       类型区分
+     - parameter    cacheOptions:   缓存选项
      - parameter    success:        成功：图片
      - parameter    progress:       加载进度
      - parameter    error:          失败：错误
@@ -181,6 +190,7 @@ public extension ImageLoadProtocol {
     func load(_ url: URL,
               defaultImage: Image? = nil,
               enumType: EnumType? = nil,
+              cacheOptions: Set<Image.CacheOption> = [.ram, .disk],
               success: ((Image)->Void)? = nil,
               progress: ((Int64, Int64)->Void)? = nil,
               error: ((Error)->Void)? = nil) {
@@ -194,6 +204,7 @@ public extension ImageLoadProtocol {
      - parameter    request:        请求
      - parameter    defaultImage:   默认图
      - parameter    enumType:       类型区分
+     - parameter    cacheOptions:   缓存选项
      - parameter    success:        成功：图片或GIF图
      - parameter    progress:       加载进度
      - parameter    error:          失败：错误
@@ -201,6 +212,7 @@ public extension ImageLoadProtocol {
     func load(_ request: URLRequest,
               defaultImage: Image? = nil,
               enumType: EnumType? = nil,
+              cacheOptions: Set<Image.CacheOption> = [.ram, .disk],
               success: ((Image)->Void)? = nil,
               progress: ((Int64, Int64)->Void)? = nil,
               error: ((Error)->Void)? = nil) {
@@ -210,7 +222,7 @@ public extension ImageLoadProtocol {
         /// 是否已返回值（缓存有值会立即返回）
         var bool = false
         
-        Image.load(request, callbackKey: callbackKey(enumType), success: { [weak self] image in
+        Image.load(request, callbackKey: callbackKey(enumType), cacheOptions: cacheOptions, success: { [weak self] image in
             
             bool = true
             self?.mainThreadImage(image, enumType: enumType)

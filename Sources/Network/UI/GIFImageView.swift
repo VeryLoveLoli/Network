@@ -208,7 +208,13 @@ open class GIFImageView: UIImageView, CADisplayLinkProtocol {
         }
         else {
             
-            currentImage = CGImageSourceCreateImageAtIndex(source, list[currentIndex].index, nil)
+            if let type = CGImageSourceGetType(source) as? String, type.lowercased().contains("webp") {
+                /// `webp`使用`VP9`编码，目前解码很慢，先跳帧
+            }
+            else {
+                
+                currentImage = CGImageSourceCreateImageAtIndex(source, list[currentIndex].index, nil)
+            }
         }
         
         layer.setNeedsDisplay()

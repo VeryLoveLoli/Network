@@ -55,7 +55,7 @@ open class Image {
         
         switch format {
             
-        case .gif, .tiff:
+        case .gif, .tiff, .webp:
             
             if let cacheSize = gifCacheSize {
                 
@@ -84,7 +84,7 @@ open class Image {
                     return nil
                 }
             }
-                        
+            
         default:
             
             if let image = UIImage(data: data) {
@@ -176,6 +176,7 @@ public extension Image {
         case ico
         case cur
         case xbm
+        case webp
         case unknown
     }
     
@@ -204,25 +205,33 @@ public extension Image {
             case [0x42, 0x4d]:
                 return .bmp
             default:
-                bytes = [UInt8](data[0..<6])
+                bytes = [UInt8](data[0..<4])
                 switch bytes {
-                case [0x47, 0x49, 0x46, 0x38, 0x39, 0x61]:
-                    return .gif
-                case [0x47, 0x49, 0x46, 0x38, 0x37, 0x61]:
-                    return .gif
+                case [0x52, 0x49, 0x46, 0x46]:
+                    return .webp
+                case [0x57, 0x45, 0x42, 0x50]:
+                    return .webp
                 default:
-                    bytes = [UInt8](data[0..<8])
+                    bytes = [UInt8](data[0..<6])
                     switch bytes {
-                    case [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]:
-                        return .png
-                    case [0x00, 0x00, 0x01, 0x00, 0x01, 0x00, 0x20, 0x20]:
-                        return .ico
-                    case [0x00, 0x00, 0x02, 0x00, 0x01, 0x00, 0x20, 0x20]:
-                        return .cur
-                    case [0x23, 0x64, 0x65, 0x66, 0x69, 0x6e, 0x65, 0x20]:
-                        return .xbm
+                    case [0x47, 0x49, 0x46, 0x38, 0x39, 0x61]:
+                        return .gif
+                    case [0x47, 0x49, 0x46, 0x38, 0x37, 0x61]:
+                        return .gif
                     default:
-                        return .unknown
+                        bytes = [UInt8](data[0..<8])
+                        switch bytes {
+                        case [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]:
+                            return .png
+                        case [0x00, 0x00, 0x01, 0x00, 0x01, 0x00, 0x20, 0x20]:
+                            return .ico
+                        case [0x00, 0x00, 0x02, 0x00, 0x01, 0x00, 0x20, 0x20]:
+                            return .cur
+                        case [0x23, 0x64, 0x65, 0x66, 0x69, 0x6e, 0x65, 0x20]:
+                            return .xbm
+                        default:
+                            return .unknown
+                        }
                     }
                 }
             }
@@ -279,6 +288,8 @@ public extension Image {
      */
     static func animation(_ data: Data) -> ([UIImage], TimeInterval)? {
         
+        let format = format(data)
+        
         /// 获取图片资源
         guard let source = CGImageSourceCreateWithData(data as CFData, nil) else { return nil }
         
@@ -296,7 +307,16 @@ public extension Image {
                 continue
             }
             
-            let image = UIImage.init(cgImage: cgimage)
+            var image = UIImage.init(cgImage: cgimage)
+            
+            if format == .webp {
+                
+                /// `VP9`的图像转成`PNG`图像
+                if let data = image.pngData(), let i = UIImage(data: data) {
+                    
+                    image = i
+                }
+            }
             
             images.append(image)
             
@@ -306,17 +326,40 @@ public extension Image {
                 continue
             }
             
-            guard let gifDict = (properties as Dictionary)[kCGImagePropertyGIFDictionary] else {
+            if format == .webp {
                 
-                continue
+                if #available(iOS 14.0, *) {
+                    
+                    guard let webpDict = (properties as Dictionary)[kCGImagePropertyWebPDictionary] else {
+                        
+                        continue
+                    }
+                    guard let time = (webpDict as? Dictionary<CFString, Any>)?[kCGImagePropertyWebPDelayTime] else {
+                        
+                        continue
+                    }
+                    
+                    duration += (time as? TimeInterval) ?? 0
+                    
+                } else {
+                    // Fallback on earlier versions
+                    continue
+                }
             }
-            
-            guard let time = (gifDict as? Dictionary<CFString, Any>)?[kCGImagePropertyGIFDelayTime] else {
+            else {
                 
-                continue
+                guard let gifDict = (properties as Dictionary)[kCGImagePropertyGIFDictionary] else {
+                    
+                    continue
+                }
+                
+                guard let time = (gifDict as? Dictionary<CFString, Any>)?[kCGImagePropertyGIFDelayTime] else {
+                    
+                    continue
+                }
+                
+                duration += (time as? TimeInterval) ?? 0
             }
-            
-            duration += (time as? TimeInterval) ?? 0
         }
         
         if images.count == 0 {
@@ -332,6 +375,7 @@ public extension Image {
      
      - parameter    data:           图片数据
      - parameter    cacheSize:      缓存大小
+     
      存储规则：
      size<=0：全部存储
      占用内存大小<size：全部存储
@@ -342,6 +386,8 @@ public extension Image {
      - returns  动画GIF图片源，动画GIF列表
      */
     static func animationGIF(_ data: Data, cacheSize: Int) -> (CGImageSource, [Image.GIFItem])? {
+        
+        let format = format(data)
         
         /// 获取图片资源
         guard let source = CGImageSourceCreateWithData(data as CFData, nil) else { return nil }
@@ -360,7 +406,7 @@ public extension Image {
         for i in 0..<count {
             
             /// 获取图片
-            guard let cgimage = CGImageSourceCreateImageAtIndex(source, i, nil) else {
+            guard var cgimage = CGImageSourceCreateImageAtIndex(source, i, nil) else {
                 
                 continue
             }
@@ -409,21 +455,54 @@ public extension Image {
                 continue
             }
             
-            guard let gifDict = (properties as Dictionary)[kCGImagePropertyGIFDictionary] else {
+            if format == .webp {
                 
-                continue
+                if #available(iOS 14.0, *) {
+                    
+                    guard let webpDict = (properties as Dictionary)[kCGImagePropertyWebPDictionary] else {
+                        
+                        continue
+                    }
+                    guard let time = (webpDict as? Dictionary<CFString, Any>)?[kCGImagePropertyWebPDelayTime] else {
+                        
+                        continue
+                    }
+                    
+                    duration += (time as? TimeInterval) ?? 0
+                    
+                    /// `VP9`的图像转成`PNG`图像
+                    if isCache, let data = UIImage(cgImage: cgimage).pngData(), let image = UIImage(data: data), let cg = image.cgImage {
+                        
+                        cgimage = cg
+                    }
+                    
+                    let item = GIFItem(duration: duration, index: i, image: isCache ? cgimage : nil)
+                    
+                    items.append(item)
+                    
+                } else {
+                    // Fallback on earlier versions
+                    continue
+                }
             }
-            
-            guard let time = (gifDict as? Dictionary<CFString, Any>)?[kCGImagePropertyGIFDelayTime] else {
+            else {
                 
-                continue
+                guard let gifDict = (properties as Dictionary)[kCGImagePropertyGIFDictionary] else {
+                    
+                    continue
+                }
+                
+                guard let time = (gifDict as? Dictionary<CFString, Any>)?[kCGImagePropertyGIFDelayTime] else {
+                    
+                    continue
+                }
+                
+                duration += (time as? TimeInterval) ?? 0
+                
+                let item = GIFItem(duration: duration, index: i, image: isCache ? cgimage : nil)
+                
+                items.append(item)
             }
-            
-            duration += (time as? TimeInterval) ?? 0
-            
-            let item = GIFItem(duration: duration, index: i, image: isCache ? cgimage : nil)
-            
-            items.append(item)
         }
         
         if items.count == 0 {
